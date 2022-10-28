@@ -1,0 +1,42 @@
+.form-container {
+  border-radius: 5px;
+  background-color: #fff;
+  border-left: 0.3rem #130763 solid;
+  padding: 0.5rem;
+  margin-bottom: 0.8rem;
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
+
+  h3 {
+    margin: 0;
+    margin-bottom: 0.3rem;
+  }
+}
+
+.array-container {
+  background-color: #f9f9f9;
+  padding: 0.8rem;
+}
+
+.array-container-2 {
+  background-color: #ececec;
+}
+
+.form-slot {
+  display: none;
+}
+
+.form-slot:not(:empty) {
+  display: block;
+}
+
+.multiline-mat-option.mat-option {
+  white-space: normal;
+  line-height: normal;
+}
+
+.sub-label {
+  margin: 0;
+  padding: 0;
+  color: gray;
+  font-size: 12px;
+}

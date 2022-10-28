@@ -1,0 +1,45 @@
+@import "/src/assets/scss/variable.scss";
+
+p {
+  margin: 0;
+}
+
+.option-title {
+  color: $black;
+  font-weight: 500;
+  padding-bottom: 0.25rem;
+}
+
+.option-subtitle {
+  color: $gray;
+  font-size: 13px;
+  font-weight: 410;
+  margin-left: 10px;
+  mat-icon {
+    margin-right: 1px;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+}
+
+:host ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #51637e;
+}
+
+:host
+  ::ng-deep
+  .mat-form-field-appearance-outline.mat-focused
+  .mat-form-field-outline-thick {
+  color: #51637e !important;
+}
+:host ::ng-deep .mat-form-field-label {
+  color: #51637e !important;
+}
+
+.other-option {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}

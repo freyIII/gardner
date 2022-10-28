@@ -1,0 +1,24 @@
+$primary: rgb(0, 51, 171);
+$light-primary: #31a6ff;
+
+$secondary: #2a699d;
+
+$accent: #f7b512;
+
+$black: #363638;
+$gray: #767676;
+$light-gray: #919191;
+$lighter-gray: #cacaca;
+$white: #f6f6f6;
+
+$danger: #bf2315;
+$danger-tint: lighten($danger, 10%);
+$danger-shade: darken($danger, 5%);
+
+$warning: #f28705;
+$warning-tint: lighten($warning, 10%);
+$warning-shade: darken($warning, 5%);
+
+$success: #60b86a;
+$success-tint: lighten($success, 10%);
+$success-shade: darken($success, 5%);

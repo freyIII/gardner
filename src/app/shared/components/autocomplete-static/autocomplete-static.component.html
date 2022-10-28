@@ -1,0 +1,43 @@
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>{{ field.label }}</mat-label>
+  <input
+    type="text"
+    [readonly]="readonly"
+    [placeholder]="field.placeholder || ''"
+    matInput
+    [formControl]="autocompleteControl"
+    [matAutocomplete]="auto"
+    #inputRef
+  />
+  <mat-autocomplete
+    autoActiveFirstOption
+    #auto="matAutocomplete"
+    (optionSelected)="onOptionSelect($event, inputRef)"
+  >
+    <mat-option
+      *ngFor="let option of filteredOptions | async"
+      [value]="option"
+      [ngStyle]="{ display: searching ? 'none' : 'block' }"
+      style="height: fit-content !important; line-height: 20px"
+    >
+      <div class="flex flex-column my-2">
+        <p class="option-title">
+          {{
+            config!.type === "object"
+              ? option[config!.attributes.label]
+              : option
+          }}
+        </p>
+        <ng-container *ngIf="config!.type === 'object'">
+          <p class="option-subtitle" *ngFor="let subtitle of config!.subtitles">
+            <mat-icon *ngIf="subtitle.icon">{{ subtitle.icon }}</mat-icon
+            >{{ option[subtitle.label] }}
+          </p>
+        </ng-container>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error *ngIf="autocompleteControl?.hasError('required')">
+    {{ field.label }} is required
+  </mat-error>
+</mat-form-field>

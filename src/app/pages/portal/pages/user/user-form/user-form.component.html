@@ -1,0 +1,48 @@
+<ng-container>
+  <h3 mat-dialog-title>
+    {{ title }}
+    <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+      close
+    </mat-icon>
+  </h3>
+
+  <div mat-dialog-content>
+    <app-new-form
+      #userDetails
+      [formfields]="userFormField"
+      [object]="userInterface"
+    ></app-new-form>
+    <app-autocomplete-api
+      [config]="roleAutoConfig"
+      [field]="roleField"
+      (onControlChange)="autocompleteListener($event)"
+    ></app-autocomplete-api>
+    <app-security-form
+      *ngIf="data.action === 'add'"
+      (onFormChange)="onPasswordChange($event)"
+    ></app-security-form>
+  </div>
+  <div mat-dialog-actions align="end">
+    <div>
+      <button
+        *ngIf="data.action === 'update'"
+        mat-raised-button
+        color="warn"
+        [disabled]="!userDetails.form.valid || saving"
+        (click)="onDelete()"
+      >
+        Delete
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="
+          !userDetails.form.valid || (data.action === 'add' && !valid) || saving
+        "
+        (click)="onSubmit()"
+      >
+        {{ saving ? "Saving..." : "Submit" }}
+      </button>
+    </div>
+  </div>
+</ng-container>

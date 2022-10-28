@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>{{ data.header | titlecase }}</h2>
+<div mat-dialog-content>
+  <p *ngIf="data.msg">Are you sure you want to {{ data.msg }}?</p>
+  <p *ngIf="data.customMsg">{{ data.customMsg }}</p>
+</div>
+<div mat-dialog-actions class="btn-container">
+  <button
+    id="cancelBtn"
+    tabindex="-1"
+    class="block"
+    mat-button
+    mat-dialog-close
+  >
+    {{ leftButtonText | uppercase }}
+  </button>
+  <button
+    id="submitBtn"
+    tabindex="-1"
+    color="primary"
+    class="block"
+    mat-raised-button
+    (click)="onConfirm()"
+  >
+    {{ rightButtonText | uppercase }}
+  </button>
+</div>

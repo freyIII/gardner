@@ -1,0 +1,280 @@
+<h3 mat-dialog-title>
+  {{ title }}
+  <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+    close
+  </mat-icon>
+</h3>
+
+<div mat-dialog-content>
+  <div class="grid mt-4">
+    <form [formGroup]="scheduleFormGroup" class="col-12 grid">
+      <div class="col-3">
+        <app-autocomplete-api
+          [config]="strandAutoConfig"
+          [field]="strandField"
+          (onControlChange)="autocompleteListener($event, 'strand')"
+        ></app-autocomplete-api>
+      </div>
+
+      <mat-form-field appearance="outline" class="col-3">
+        <mat-label>Year Level*</mat-label>
+        <mat-select
+          formControlName="yearLevel"
+          (selectionChange)="selectChange($event.value, 'yearLevel')"
+        >
+          <mat-option value="1st">1st</mat-option>
+          <mat-option value="2nd">2nd</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="col-3">
+        <mat-label>Semester*</mat-label>
+        <mat-select
+          formControlName="semester"
+          (selectionChange)="selectChange($event.value, 'semester')"
+        >
+          <mat-option value="1st">1st</mat-option>
+          <mat-option value="2nd">2nd</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="col-3">
+        <mat-label>Shift*</mat-label>
+        <mat-select
+          formControlName="shift"
+          (selectionChange)="selectChange($event.value, 'shift')"
+        >
+          <mat-option value="Morning">Morning</mat-option>
+          <mat-option value="Afternoon">Afternoon</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="col-3">
+        <mat-label>Name*</mat-label>
+        <input formControlName="name" matInput />
+      </mat-form-field>
+      <div class="col-3">
+        <app-autocomplete-api
+          [config]="roomAutoConfig"
+          [field]="roomField"
+          (onControlChange)="autocompleteListener($event, 'room')"
+        ></app-autocomplete-api>
+      </div>
+    </form>
+    <div class="col-12 grid">
+      <div class="col-8">
+        <div class="flex justify-content-center grid grid-nogutter">
+          <div
+            class="col-1 justify-content-center justify-align-center"
+            style="border-right: 1px solid rgb(204, 204, 204)"
+          ></div>
+          <ng-container *ngFor="let week of weekArray">
+            <div class="col justify-content-center" style="text-align: center">
+              <p class="word" style="text-transform: uppercase">
+                {{ week.day }}
+              </p>
+            </div>
+          </ng-container>
+        </div>
+        <div class="boundary">
+          <ng-container *ngIf="selectedShift === 'Morning'">
+            <div
+              class="grid grid-nogutter mt-0"
+              *ngFor="let time of morningArray; let iTime = index"
+            >
+              <div
+                class="col-1 text-xs time"
+                [ngClass]="iTime % 2 ? 'odd-time' : 'even-time'"
+              >
+                <small>
+                  {{ time }}
+                </small>
+              </div>
+              <div
+                *ngFor="let week of weekArray"
+                class="col p-0 date-header"
+                [ngClass]="iTime % 2 ? 'odd' : 'even'"
+              >
+                <ng-container
+                  *ngIf="
+                    week &&
+                    week.scheds &&
+                    week.scheds[time] &&
+                    week.scheds[time].distance &&
+                    week.scheds[time].shift === 'Morning' &&
+                    !loadSched
+                  "
+                >
+                  <section
+                    class="event-me"
+                    [ngStyle]="{
+                      height:
+                        'calc(' +
+                        (week.scheds[time].distance || 0) * 100 +
+                        '% + ' +
+                        week.scheds[time].distance +
+                        'px)'
+                    }"
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                      "
+                    >
+                      <p style="text-overflow: clip; font-size: 9px">
+                        {{
+                          week.scheds[time]._professor.firstName +
+                            " " +
+                            week.scheds[time]._professor.lastName
+                        }}
+                      </p>
+                      <mat-icon
+                        color="warn"
+                        style="
+                          font-size: 20px;
+                          cursor: pointer;
+                          padding-left: 10px;
+                        "
+                        (click)="onRemove(time)"
+                        >close</mat-icon
+                      >
+                    </div>
+                    <p style="text-overflow: clip; font-size: 9px">
+                      {{ week.scheds[time]._subject.name }}
+                    </p>
+                  </section>
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="selectedShift === 'Afternoon'">
+            <div
+              class="grid grid-nogutter mt-0"
+              *ngFor="let time of afternoonArray; let iTime = index"
+            >
+              <div
+                class="col-1 text-xs time"
+                [ngClass]="iTime % 2 ? 'odd-time' : 'even-time'"
+              >
+                <small>
+                  {{ time }}
+                </small>
+              </div>
+              <div
+                *ngFor="let week of weekArray"
+                class="col p-0 date-header"
+                [ngClass]="iTime % 2 ? 'odd' : 'even'"
+              >
+                <ng-container
+                  *ngIf="
+                    week &&
+                    week.scheds &&
+                    week.scheds[time] &&
+                    week.scheds[time].distance &&
+                    week.scheds[time].shift === 'Afternoon' &&
+                    !loadSched
+                  "
+                >
+                  <section
+                    class="event-me"
+                    [ngStyle]="{
+                      height:
+                        'calc(' +
+                        (week.scheds[time].distance || 0) * 100 +
+                        '% + ' +
+                        week.scheds[time].distance +
+                        'px)'
+                    }"
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                      "
+                    >
+                      <p style="text-overflow: clip; font-size: 9px">
+                        {{
+                          week.scheds[time]._professor.firstName +
+                            " " +
+                            week.scheds[time]._professor.lastName
+                        }}
+                      </p>
+                      <mat-icon
+                        color="warn"
+                        style="
+                          font-size: 20px;
+                          cursor: pointer;
+                          padding-left: 10px;
+                        "
+                        (click)="onRemove(time)"
+                        >close</mat-icon
+                      >
+                    </div>
+                    <p style="text-overflow: clip; font-size: 9px">
+                      {{ week.scheds[time]._subject.name }}
+                    </p>
+                  </section>
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="col-4" [ngClass]="loading ? 'center' : 'block'">
+        <mat-progress-spinner mode="indeterminate" *ngIf="loading">
+        </mat-progress-spinner>
+        <ng-container *ngIf="professors.length && !loading">
+          <ng-container *ngFor="let subject of subjects">
+            <ng-container *ngFor="let professor of professors">
+              <ng-container *ngIf="professor._subjects.includes(subject._id)">
+                <div class="box">
+                  <div
+                    style="
+                      width: 100%;
+                      display: flex;
+                      justify-content: space-between;
+                    "
+                  >
+                    <div>
+                      <p>
+                        {{ professor.firstName + " " + professor.lastName }}
+                      </p>
+                      <p>{{ subject.name + " - " + subject.code }}</p>
+                    </div>
+                    <button
+                      class="fab"
+                      mat-mini-fab
+                      style="margin-right: 10px"
+                      (click)="onRowClick(professor, subject)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="!professors.length && !loading">
+          <p>No Professor Available!</p>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <div>
+    <button
+      *ngIf="data.action === 'update'"
+      mat-raised-button
+      color="warn"
+      (click)="onDelete()"
+    >
+      Delete
+    </button>
+
+    <button mat-raised-button color="primary" (click)="onSave()">
+      {{ saving ? "Saving..." : "Submit" }}
+    </button>
+  </div>
+</div>

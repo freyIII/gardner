@@ -1,0 +1,67 @@
+import { Section } from 'src/app/models/form.interface';
+
+export const SUBJECT_FORM: Section[] = [
+  {
+    section: 'Subject Details',
+    show: true,
+    items: [
+      {
+        label: 'Subject Name',
+        fcname: 'name',
+        path: 'name',
+        type: 'text',
+        colspan: { xs: 12, sm: 12, md: 6, lg: 6, xl: 6 },
+        show: true,
+        appearance: 'standard',
+      },
+      {
+        label: 'Subject Code',
+        fcname: 'code',
+        path: 'code',
+        type: 'text',
+        colspan: { xs: 12, sm: 12, md: 6, lg: 6, xl: 6 },
+        show: true,
+        appearance: 'standard',
+      },
+      {
+        label: 'Description',
+        fcname: 'description',
+        path: 'description',
+        type: 'textarea',
+        colspan: { xs: 12, sm: 12, md: 12, lg: 12, xl: 12 },
+        show: true,
+        appearance: 'standard',
+      },
+      {
+        label: 'Type',
+        fcname: 'type',
+        path: 'type',
+        type: 'select',
+        choices: ['Core', 'Contextualized', 'Specialized'],
+        colspan: { xs: 12, sm: 12, md: 6, lg: 6, xl: 6 },
+        show: true,
+        appearance: 'standard',
+      },
+      {
+        label: 'Year Level',
+        fcname: 'yearLevel',
+        path: 'yearLevel',
+        type: 'select',
+        choices: ['1st', '2nd'],
+        colspan: { xs: 12, sm: 12, md: 6, lg: 6, xl: 6 },
+        show: true,
+        appearance: 'standard',
+      },
+      {
+        label: 'Semester',
+        fcname: 'semester',
+        path: 'semester',
+        type: 'select',
+        choices: ['1st', '2nd'],
+        colspan: { xs: 12, sm: 12, md: 6, lg: 6, xl: 6 },
+        show: true,
+        appearance: 'standard',
+      },
+    ],
+  },
+];

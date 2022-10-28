@@ -1,0 +1,78 @@
+<div class="filter-area grid" [formGroup]="filterFormGroup">
+  <ng-container *ngFor="let filter of filters; let i = index">
+    <mat-form-field
+      class="col"
+      *ngIf="filter.type === 'text'"
+      appearance="outline"
+    >
+      <mat-label>{{ filter.label }}</mat-label>
+      <input matInput [formControlName]="filter.name" />
+    </mat-form-field>
+
+    <mat-form-field
+      class="col"
+      *ngIf="filter.type === 'number'"
+      appearance="outline"
+    >
+      <mat-label>{{ filter.label }}</mat-label>
+      <input
+        matInput
+        [formControlName]="filter.name"
+        [maxlength]="filter.maxLength"
+        (keypress)="numberInputOnly($event)"
+      />
+    </mat-form-field>
+
+    <mat-form-field
+      class="col"
+      *ngIf="filter.type === 'select'"
+      appearance="outline"
+    >
+      <mat-label>{{ filter.label }}</mat-label>
+      <mat-select matInput [formControlName]="filter.fcName || filter.name">
+        <mat-option
+          *ngFor="let option of filter.options"
+          [value]="option.value || option.label"
+          >{{ option.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="filter.type === 'autocomplete'" class="col">
+      <app-table-autocomplete-filter
+        (onControlChange)="onFilterChange(filter, $event)"
+        [label]="filter.label"
+        [config]="$any(filter.config)"
+      >
+      </app-table-autocomplete-filter>
+    </div>
+
+    <div *ngIf="filter.type === 'date-range'" class="col">
+      <app-table-date-range-filter
+        [label]="filter.label"
+        (onFormChange)="onFilterChange(filter, $event)"
+      >
+      </app-table-date-range-filter>
+    </div>
+  </ng-container>
+</div>
+<div class="btns">
+  <button
+    color="primary"
+    class="filt"
+    (click)="onFilterClick()"
+    [disabled]="!filterFormGroup.dirty || loading"
+    mat-flat-button
+  >
+    {{ loading ? "Filtering..." : "Filter" }}
+    <mat-icon>fast_forward</mat-icon>
+  </button>
+  <button
+    mat-stroked-button
+    (click)="onClearClick()"
+    [disabled]="!filterFormGroup.dirty || loading"
+    color="warn"
+  >
+    Clear
+  </button>
+</div>

@@ -1,0 +1,71 @@
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>{{ field.label }}</mat-label>
+  <input
+    type="text"
+    [readonly]="readonly"
+    [placeholder]="field.placeholder || ''"
+    matInput
+    (blur)="onBlur()"
+    [formControl]="autocompleteControl"
+    [matAutocomplete]="auto"
+    #inputRef
+  />
+
+  <mat-autocomplete
+    autoActiveFirstOption
+    #auto="matAutocomplete"
+    (optionSelected)="onOptionSelect($event)"
+  >
+    <ng-container
+      *ngIf="{
+        results: filteredOptions | async,
+        loading: loading | async
+      } as obs"
+    >
+      <mat-option style="font-size: 14px" disabled *ngIf="obs.loading">
+        Searching, please wait...
+      </mat-option>
+      <mat-option
+        style="font-size: 14px"
+        disabled
+        *ngIf="obs.results?.length === 0 && !obs.loading"
+      >
+        No result found...
+      </mat-option>
+      <ng-container *ngIf="!obs.loading">
+        <mat-option
+          *ngFor="let option of obs.results"
+          [value]="option"
+          style="height: fit-content !important; line-height: 20px"
+        >
+          <div class="flex flex-column my-2">
+            <p class="option-title">
+              <ng-container *ngIf="config.attributes.displayedText; else label">
+                <ng-container
+                  *ngFor="let path of config.attributes.displayedText"
+                >
+                  {{ option[path] + " " }}
+                </ng-container>
+              </ng-container>
+              <ng-template #label>{{
+                option[config.attributes.label] ||
+                  option[config.attributes.altPath]
+              }}</ng-template>
+            </p>
+
+            <p
+              class="option-subtitle"
+              *ngFor="let subtitle of config.subtitles"
+            >
+              <mat-icon *ngIf="subtitle.icon">{{ subtitle.icon }}</mat-icon>
+              {{ (option | objectFind: subtitle.label:"value") || "N/A" }}
+            </p>
+          </div>
+        </mat-option>
+      </ng-container>
+    </ng-container>
+  </mat-autocomplete>
+  <mat-error *ngIf="autocompleteControl?.hasError('required')">
+    {{ field.label }} is required
+  </mat-error>
+</mat-form-field>

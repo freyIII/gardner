@@ -1,0 +1,274 @@
+<div class="grid">
+  <div class="query-filter-container col-12">
+    <!-- Filter Buttons -->
+    <button
+      mat-raised-button
+      class="filter-button"
+      *ngFor="let filterButton of filterButtons"
+      [disabled]="loading || exporting"
+      [color]="filterButton.selected ? 'primary' : ''"
+      (click)="onFilterButtonClick(filterButton)"
+    >
+      {{ filterButton.label }}
+      <mat-chip *ngIf="filterButton.badge">{{ filterButton.badge }}</mat-chip>
+    </button>
+  </div>
+  <div class="col-12 main">
+    <mat-toolbar>
+      <div class="search-box">
+        <button class="btn-search" (click)="onSearch()">
+          <mat-icon>search</mat-icon>
+        </button>
+        <input
+          type="text"
+          [ngClass]="{
+            'input-search': keyword.length === 0,
+            'input-toggle': keyword.length > 0
+          }"
+          placeholder="Type to Search..."
+          [(ngModel)]="keyword"
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+      <div class="flex-stretch"></div>
+      <!-- Slot -->
+      <ng-content select="[extra-buttons]"></ng-content>
+      <!-- Filters  -->
+      <button
+        *ngIf="filterInputs"
+        mat-mini-fab
+        class="tbl-btn"
+        [disabled]="loading || exporting"
+        (click)="toggleAdvancedFilter()"
+      >
+        <mat-icon>
+          {{ !openFilter ? "filter_alt" : "filter_alt_off" }}
+        </mat-icon>
+      </button>
+      <ng-container *ngIf="config.exportConfig">
+        <button
+          mat-mini-fab
+          class="tbl-btn"
+          [matMenuTriggerFor]="exportOptions"
+          [disabled]="loading || exporting"
+          matTooltip="Export/ Download"
+        >
+          <mat-icon> download </mat-icon>
+        </button>
+        <mat-menu #exportOptions="matMenu">
+          <button mat-menu-item (click)="onExportClick('page')">
+            <mat-icon>article</mat-icon>
+            <span>Export Current Page</span>
+          </button>
+          <button mat-menu-item (click)="onExportClick('all')">
+            <mat-icon>library_books</mat-icon>
+            <span>Export All Pages</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+      <button
+        mat-mini-fab
+        class="tbl-btn"
+        color="primary"
+        [matMenuTriggerFor]="menu"
+        matTooltip="More options"
+      >
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu" xPosition="before">
+        <button (click)="dataSource = []; triggerRefresh()" mat-menu-item>
+          <mat-icon>refresh</mat-icon>
+          <span>Refresh Table</span>
+        </button>
+
+        <button mat-menu-item [matMenuTriggerFor]="showColumns">
+          <mat-icon>view_column</mat-icon>
+          <span>Select Column to Display</span>
+        </button>
+      </mat-menu>
+      <!-- For New Column Selector -->
+      <mat-menu #showColumns="matMenu">
+        <ng-container *ngFor="let col of duplicateColumns">
+          <div
+            class="columns"
+            *ngIf="
+              !(
+                selectedFilterButton &&
+                selectedFilterButton.hiddenColumns &&
+                selectedFilterButton.hiddenColumns.includes(col.path)
+              )
+            "
+            (click)="
+              col.selected = !col.selected;
+              $event.stopPropagation();
+              updateBreakpoint()
+            "
+          >
+            <mat-checkbox
+              *ngIf="col.title !== ''"
+              [(ngModel)]="col.selected"
+              (ngModelChange)="updateBreakpoint()"
+              (click)="$event.stopPropagation()"
+              color="primary"
+            >
+              {{ col.title }}
+            </mat-checkbox>
+          </div>
+        </ng-container>
+      </mat-menu>
+    </mat-toolbar>
+    <!-- Advanced Filter -->
+    <div [@filtAnimation] *ngIf="openFilter">
+      <app-table-advanced-filter
+        [filters]="filterInputs"
+        [loading]="loading"
+        (onFilter)="onFilter($event)"
+        #advancedFilterRef
+      >
+      </app-table-advanced-filter>
+    </div>
+
+    <div class="table-responsive">
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        matSort
+        (matSortChange)="onSort($event)"
+      >
+        <ng-container
+          matColumnDef="select"
+          *ngIf="selectedFilterButton?.checkbox || config.checkbox"
+        >
+          <th mat-header-cell class="pr-4" *matHeaderCellDef>
+            <mat-checkbox
+              color="primary"
+              [indeterminate]="
+                checkedRows.hasValue() &&
+                dataSource.length !== checkedRows.selected.length
+              "
+              [checked]="
+                checkedRows.hasValue() &&
+                dataSource.length === checkedRows.selected.length
+              "
+              (click)="$event.stopPropagation()"
+              (change)="$event ? checkAll() : null"
+            >
+            </mat-checkbox>
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let row"
+            class="pr-4"
+            (click)="$event.stopPropagation()"
+          >
+            <span>
+              <mat-checkbox
+                color="primary"
+                [checked]="checkedRows.isSelected(row._id)"
+                (click)="$event.stopPropagation()"
+                (change)="$event ? onCheckBoxChange(row._id) : null"
+              >
+              </mat-checkbox>
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container *ngFor="let col of columns">
+          <ng-container [matColumnDef]="col.path">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              [disabled]="!sortableColumns.includes(col.type)"
+              mat-sort-header
+            >
+              {{ col.title }}
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <ng-container
+                *ngIf="{
+                  value: element | objectFind: col.path:'value'
+                } as column"
+              >
+                <span *ngIf="col.type == 'text' || col.type == 'idRef'">
+                  {{
+                    column.value ||
+                      (element | objectFind: col.altPath:"value") ||
+                      col.ifNull ||
+                      "-"
+                  }}
+                </span>
+                <span *ngIf="col.type == 'array'">
+                  {{ util.deepFind(element, col.path) || "-" }}
+                </span>
+                <span *ngIf="col.type == 'logical'">
+                  {{ displayLogical(element, col.conditions) }}
+                </span>
+                <span *ngIf="col.type == 'date'">
+                  {{ column.value | date: col.dateFormat || "medium" }}
+                </span>
+                <span *ngIf="col.type == 'number'">
+                  {{
+                    column.value
+                      ? (column.value | number: "1.2-4":"en-US")
+                      : "-"
+                  }}
+                </span>
+                <span *ngIf="col.type == 'percentage'">
+                  {{
+                    column.value
+                      ? (column.value | number: "1.1-2":"en-US")
+                      : "0"
+                  }}
+                </span>
+                <span *ngIf="col.type == 'special'">
+                  <span *ngFor="let path of col.paths">
+                    {{ element | objectFind: path:"value" }}
+                  </span>
+                </span>
+                <span *ngIf="col.type == 'currency'">
+                  {{ column.value ? (column.value | currency: "PHP ") : "-" }}
+                </span>
+              </ng-container>
+            </td>
+          </ng-container>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns; let i = index"
+          (click)="onRowClick.emit({ row: row, i: i })"
+        ></tr>
+      </table>
+
+      <!-- Pagination -->
+      <mat-paginator
+        style="border-top: 1px solid #2a699da1"
+        *ngIf="dataSource && dataSource.length && !loading"
+        [length]="dataLength"
+        [pageSize]="pagination.pageSize"
+        [pageIndex]="pagination.pageIndex - 1"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPaginationChange($event)"
+        showFirstLastButtons
+      >
+      </mat-paginator>
+    </div>
+
+    <div *ngIf="!dataSource?.length && !loading" align="center" class="mt-3">
+      <p>No available data yet.</p>
+    </div>
+
+    <div *ngIf="loading" class="loading mt-4">
+      <ngx-skeleton-loader
+        count="10"
+        animation="progress-dark"
+        [theme]="{
+          height: '33px',
+          'background-color': '#efefef',
+          border: '1px solid #',
+          'animation-duration': '1s'
+        }"
+      ></ngx-skeleton-loader>
+    </div>
+  </div>
+</div>

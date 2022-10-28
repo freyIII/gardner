@@ -1,0 +1,19 @@
+<app-table
+  [config]="tableConfig"
+  [dataSource]="dataSource"
+  [dataLength]="dataLength"
+  [loading]="loading"
+  (onTableChange)="fetchData($event)"
+  (onRowClick)="onRowClick($event.row)"
+></app-table>
+<button
+  mat-fab
+  id="addBtn"
+  color="primary"
+  class="btn-float-bottom"
+  [disabled]="loading"
+  matTooltip="Add Schedule"
+  (click)="onAdd()"
+>
+  <mat-icon>add</mat-icon>
+</button>

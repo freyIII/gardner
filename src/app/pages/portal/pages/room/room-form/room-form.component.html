@@ -1,0 +1,48 @@
+<ng-container>
+  <h3 mat-dialog-title>
+    {{ title }}
+    <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+      close
+    </mat-icon>
+  </h3>
+
+  <div mat-dialog-content>
+    <app-new-form
+      #roomDetails
+      [formfields]="roomFormField"
+      [object]="roomInterface"
+    ></app-new-form>
+  </div>
+  <div mat-dialog-actions align="end">
+    <div>
+      <button
+        *ngIf="data.action === 'update'"
+        mat-raised-button
+        color="warn"
+        [disabled]="!roomDetails.form.valid || saving"
+        (click)="onStatusChange('Deleted')"
+      >
+        Delete
+      </button>
+      <button
+        *ngIf="data.action === 'update'"
+        mat-raised-button
+        [color]="data.form.status === 'Active' ? 'warn' : 'primary'"
+        [disabled]="!roomDetails.form.valid || saving"
+        (click)="
+          onStatusChange(data.form.status === 'Active' ? 'Inactive' : 'Active')
+        "
+      >
+        {{ data.form.status === "Active" ? "Deactivate" : "Activate" }}
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!roomDetails.form.valid || saving"
+        (click)="onSubmit()"
+      >
+        {{ saving ? "Saving..." : "Submit" }}
+      </button>
+    </div>
+  </div>
+</ng-container>

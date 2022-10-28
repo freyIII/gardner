@@ -1,0 +1,56 @@
+@import "/src/assets/scss/variable.scss";
+
+.filter-area {
+  display: flex;
+  border-radius: 5px;
+  padding: 0.6rem 0.6rem;
+  gap: 16px;
+
+  > * {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 300px;
+    font-size: 16px;
+  }
+}
+
+.btns {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  justify-content: flex-end;
+  padding: 0.8rem;
+  button {
+    letter-spacing: 0.1rem;
+    font-size: 14px;
+    margin-left: 0.4rem;
+  }
+}
+
+:host
+  ::ng-deep
+  .mat-form-field-appearance-outline.mat-focused
+  .mat-form-field-outline-thick {
+  color: $primary !important;
+}
+:host ::ng-deep .mat-form-field-label {
+  color: $primary !important;
+}
+
+@media only screen and (max-width: 842px) {
+}
+
+@media only screen and (max-width: 760px) {
+  .filter-area > * {
+    flex-grow: 1;
+  }
+}
+
+@media only screen and (max-width: 650px) {
+}
+
+@media only screen and (max-width: 460px) {
+  .btns {
+    justify-content: center;
+  }
+}

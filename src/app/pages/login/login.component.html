@@ -1,0 +1,60 @@
+<div class="main-container">
+  <div class="grid form-container">
+    <div class="right col-12 md:col-6">
+      <img src="../../../assets/images/logo.png" alt="Logo" />
+      <h2>Login Account</h2>
+      <div>
+        <form [formGroup]="credentials">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input type="email" matInput formControlName="email" />
+            <mat-icon color="primary" matSuffix>mail</mat-icon>
+            <mat-error *ngIf="credentials.get('email')?.hasError('required')">
+              Please enter your email
+            </mat-error>
+            <mat-error *ngIf="credentials.get('email')?.hasError('pattern')">
+              Please use email format
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              matInput
+              formControlName="password"
+            />
+            <mat-icon
+              matSuffix
+              color="primary"
+              class="clickable"
+              (click)="showPassword = !showPassword"
+            >
+              visibility{{ showPassword ? "_off" : "" }}
+            </mat-icon>
+            <mat-error
+              *ngIf="credentials.get('password')?.hasError('required')"
+            >
+              Please enter your password
+            </mat-error>
+          </mat-form-field>
+        </form>
+
+        <button
+          mat-raised-button
+          [disabled]="!credentials.valid || loggingIn"
+          (click)="onSubmit()"
+          style="margin-top: 8px"
+        >
+          <mat-spinner
+            style="margin-left: 45%"
+            color="primary"
+            *ngIf="loggingIn"
+            [diameter]="30"
+          ></mat-spinner>
+          <span style="font-size: 1rem" *ngIf="!loggingIn">LOGIN</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

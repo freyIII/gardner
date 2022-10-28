@@ -1,0 +1,102 @@
+<form
+  [formGroup]="securityForm"
+  class="grid"
+  style="margin: 16px; padding-top: 16px"
+>
+  <mat-form-field class="col-6">
+    <mat-label>Password</mat-label>
+    <input
+      matInput
+      formControlName="password"
+      [type]="visible.password ? 'text' : 'password'"
+      clearOnEdit="false"
+      (blur)="passwordFocus = false"
+      (focus)="passwordFocus = true"
+    />
+    <mat-icon
+      matSuffix
+      slot="end"
+      (click)="visible.password = !visible.password"
+      color="tertiary"
+      >{{ visible.password ? "visibility_off" : "visibility" }}
+    </mat-icon>
+    <mat-error
+      *ngIf="
+        (form.password.dirty || form.password.touched) &&
+        form.password.errors?.required
+      "
+      >Password is required.
+    </mat-error>
+
+    <mat-error
+      [ngClass]="
+        (form.password.value | pattern: '^.{8,}$') ? 'correct' : 'incorrect'
+      "
+    >
+      Use 8 or more characters.
+    </mat-error>
+
+    <mat-error
+      [ngClass]="
+        (form.password.value | pattern: '^(?=.*[a-z])(?=.*[A-Z])')
+          ? 'correct'
+          : 'incorrect'
+      "
+    >
+      Use upper and lower case letters. (e.g. Aa)
+    </mat-error>
+    <mat-error
+      [ngClass]="
+        (form.password.value | pattern: '.*[0-9].*') ? 'correct' : 'incorrect'
+      "
+    >
+      Use a number. (e.g. 1234)
+    </mat-error>
+
+    <mat-error
+      [ngClass]="
+        (form.password.value | pattern: '.*[!@#$%^&*].*')
+          ? 'correct'
+          : 'incorrect'
+      "
+    >
+      Use a symbol. (e.g. !@#$)
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="col-6">
+    <mat-label>Confirm Password</mat-label>
+    <input
+      matInput
+      formControlName="passwordConfirm"
+      [type]="visible.passwordConfirm ? 'text' : 'password'"
+      clearOnEdit="false"
+    />
+    <mat-icon
+      matSuffix
+      slot="end"
+      (click)="visible.passwordConfirm = !visible.passwordConfirm"
+      color="tertiary"
+      >{{ visible.passwordConfirm ? "visibility_off" : "visibility" }}
+    </mat-icon>
+    <mat-error
+      slot="error"
+      color="danger"
+      *ngIf="
+        (form.passwordConfirm?.dirty || form.passwordConfirm.touched) &&
+        form.passwordConfirm.errors?.required
+      "
+    >
+      *Confirm password is required.
+    </mat-error>
+    <mat-error
+      slot="error"
+      color="danger"
+      *ngIf="
+        (form.passwordConfirm?.dirty || form.passwordConfirm.touched) &&
+        form.passwordConfirm.errors?.mustMatch
+      "
+    >
+      *Confirm password field does not match the password field.
+    </mat-error>
+  </mat-form-field>
+</form>

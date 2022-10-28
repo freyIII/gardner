@@ -1,0 +1,150 @@
+<mat-sidenav-container autosize *ngIf="!loggingOut">
+  <mat-sidenav #sidenav="matSidenav" mode="over" class="mat-elevation-z8">
+    <div class="list-container">
+      <mat-list style="padding-top: 0">
+        <div class="headerSideNav">
+          <img src="../../../assets/images/logo.png" />
+        </div>
+
+        <!-- Nav List -->
+        <div style="padding: 12px">
+          <ng-container *ngFor="let item of navigation">
+            <!-- SOLO ITEM -->
+            <ng-container *ngIf="item.route">
+              <mat-list-item
+                [routerLink]="[item.route]"
+                (click)="changeRoute(item); sidenav.toggle()"
+                routerLinkActive="router-active-link"
+              >
+                <mat-icon color="primary" mat-list-icon>
+                  {{ item.metadata }}
+                </mat-icon>
+                {{ item.label }}
+              </mat-list-item>
+            </ng-container>
+
+            <ng-container *ngIf="!item.route && !item.subaccess?.length">
+              <mat-list-item class="inactive">
+                <mat-icon color="primary" mat-list-icon>
+                  {{ item.metadata }}
+                </mat-icon>
+                {{ item.label }}
+              </mat-list-item>
+            </ng-container>
+
+            <!-- WITH CHILD NAV -->
+            <div class="my-4" *ngIf="!item.route && item.subaccess?.length">
+              <p
+                style="
+                  height: auto;
+                  line-height: 10px;
+                  font-size: 10px;
+                  padding-left: 0.3rem;
+                  padding-right: 0.3rem;
+                  padding-bottom: 0;
+                  letter-spacing: 0.1rem;
+                  opacity: 0.7;
+                  text-align: left;
+                "
+                mat-subheader
+              >
+                {{ item.label }}
+              </p>
+              <ng-container *ngFor="let child of item.subaccess">
+                <mat-list-item
+                  [routerLink]="[child.route]"
+                  (click)="changeRoute(child); sidenav.toggle()"
+                  routerLinkActive="router-active-link"
+                >
+                  <mat-icon color="primary" mat-list-icon>
+                    {{ child.metadata }}
+                  </mat-icon>
+                  {{ child.label }}
+                </mat-list-item>
+
+                <mat-list-item class="inactive" *ngIf="!child.route">
+                  <mat-icon color="primary" mat-list-icon>
+                    {{ child.metadata }}
+                  </mat-icon>
+                  {{ child.label }}
+                </mat-list-item>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </mat-list>
+    </div>
+  </mat-sidenav>
+  <!-- HEADER -->
+  <mat-sidenav-content>
+    <mat-toolbar class="fixed-header">
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span style="padding-right: 0.5rem"></span>
+      <img
+        style="width: 250px; cursor: pointer"
+        class="nav-title m-0"
+        routerLink="dashboard"
+        src="../../../assets/images/logo2.png"
+        (click)="changeRoute(dashboard)"
+      />
+      <span class="header-spacer"></span>
+      <ngx-avatar
+        *ngIf="me"
+        name="{{ me.firstName }} {{ me.lastName }}"
+        bgColor="#f6f6f6"
+        fgColor="#3387c8"
+        size="40"
+        [round]="false"
+        cornerRadius="5"
+        class="header-avatar"
+        [matMenuTriggerFor]="menu"
+      ></ngx-avatar>
+      <mat-menu #menu="matMenu">
+        <mat-card
+          style="
+            text-align: center;
+            background: #f6f6f6;
+            border: none;
+            box-shadow: none;
+            padding-bottom: 0;
+          "
+        >
+          <mat-card-header>
+            <mat-card-title>
+              {{ me ? me.email.toUpperCase() : "" }}
+            </mat-card-title>
+            <mat-card-subtitle>
+              {{ me ? me.type.toUpperCase() : "" }}
+            </mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+        <button mat-menu-item (click)="onChangePassword()">
+          <mat-icon>vpn_key</mat-icon>
+          <span>Change Password</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>settings_power</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+    <mat-toolbar class="lower-header">
+      <p class="m-0" style="font-size: 16px">
+        {{ routeLabel }}
+      </p>
+      <div class="flex-stretch"></div>
+    </mat-toolbar>
+
+    <div class="content">
+      <div class="p-5" *ngIf="!routerChangeLoad">
+        <router-outlet></router-outlet>
+      </div>
+      <app-loading
+        [label]="'Navigating to ' + routeLabel"
+        *ngIf="routerChangeLoad"
+      ></app-loading>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

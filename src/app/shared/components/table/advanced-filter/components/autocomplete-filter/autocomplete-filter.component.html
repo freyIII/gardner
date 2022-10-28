@@ -1,0 +1,42 @@
+<mat-form-field appearance="outline" style="width: 100%"
+  *ngIf="{results: filteredOptions| async, loading: loading | async} as obs">
+  <mat-label>{{ label }}</mat-label>
+  <input type="text" placeholder="Type to search..." (blur)="onBlur()" matInput [formControl]="autocompleteControl"
+    [matAutocomplete]="auto" #inputRef>
+  <mat-icon matSuffix (click)="reset()">close</mat-icon>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelect($event)">
+    <mat-option style="font-size: 14px;" disabled *ngIf="obs.loading">
+      Searching, please wait...
+    </mat-option>
+    <mat-option style="font-size: 14px;" disabled *ngIf="obs.results?.length === 0 && !obs.loading">
+      No result found...
+    </mat-option>
+    <ng-container *ngIf="!obs.loading">
+
+      <mat-option *ngFor="let option of obs.results" [value]="option"
+        style="height: fit-content !important; line-height: 20px">
+        <div class="flex flex-column my-2">
+          <p class="option-title">
+            <ng-container *ngIf="config.attributes.displayedText; else label">
+              <ng-container *ngFor="let path of config.attributes.displayedText">
+                {{ option[path] + " " }}
+              </ng-container>
+            </ng-container>
+            <ng-template #label>{{
+              option[config.attributes.label]
+              }}</ng-template>
+          </p>
+
+          <p class="option-subtitle" *ngFor="let subtitle of config.subtitles">
+            <mat-icon *ngIf="subtitle.icon">{{ subtitle.icon }}</mat-icon>
+            <span *ngIf="!subtitle.type">{{ (option | objectFind: subtitle.label:"value") || "N/A" }}</span>
+            <span *ngIf="subtitle.type === 'date'">
+              {{ (option | objectFind: subtitle.label:"value" | date:'mediumDate') || "N/A" }}
+            </span>
+          </p>
+
+        </div>
+      </mat-option>
+    </ng-container>
+  </mat-autocomplete>
+</mat-form-field>

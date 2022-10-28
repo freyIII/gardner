@@ -1,0 +1,80 @@
+<ng-container>
+  <h3 mat-dialog-title>
+    {{ title }}
+    <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+      close
+    </mat-icon>
+  </h3>
+
+  <div mat-dialog-content>
+    <form [formGroup]="formGroup" class="grid">
+      <mat-form-field appearance="outline" class="col-12">
+        <mat-label>Professor</mat-label>
+        <input matInput [value]="professor" disabled="true" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="col-12">
+        <mat-label>Subject</mat-label>
+        <input matInput [value]="subject" disabled="true" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="col-12">
+        <mat-label>Shift</mat-label>
+        <input matInput [value]="data.shift" disabled="true" />
+      </mat-form-field>
+      <mat-form-field
+        appearance="outline"
+        class="xs:col-12 sm: col-12 md: col-6 lg:col-6 xl:col-6"
+      >
+        <mat-label>Start Time</mat-label>
+        <mat-select formControlName="startTime">
+          <ng-container *ngIf="data.shift === 'Morning'">
+            <mat-option *ngFor="let time of morningArray" [value]="time">
+              {{ time }}
+            </mat-option>
+          </ng-container>
+          <ng-container *ngIf="data.shift === 'Afternoon'">
+            <mat-option *ngFor="let time of afternoonArray" [value]="time">
+              {{ time }}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field
+        appearance="outline"
+        class="xs:col-12 sm: col-12 md: col-6 lg:col-6 xl:col-6"
+      >
+        <mat-label>End Time</mat-label>
+        <mat-select formControlName="endTime">
+          <ng-container *ngIf="data.shift === 'Morning'">
+            <mat-option *ngFor="let time of morningArray" [value]="time">
+              {{ time }}
+            </mat-option>
+          </ng-container>
+          <ng-container *ngIf="data.shift === 'Afternoon'">
+            <mat-option *ngFor="let time of afternoonArray" [value]="time">
+              {{ time }}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="col-12">
+        <mat-label>Day</mat-label>
+        <mat-select formControlName="day">
+          <mat-option *ngFor="let day of days" [value]="day">
+            {{ day }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!formGroup.valid"
+      (click)="onSave()"
+    >
+      Add
+    </button>
+  </div>
+</ng-container>

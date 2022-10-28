@@ -1,0 +1,37 @@
+<ng-container>
+  <h3 mat-dialog-title>
+    {{ title }}
+    <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+      close
+    </mat-icon>
+  </h3>
+
+  <div mat-dialog-content>
+    <app-new-form
+      #subjectDetails
+      [formfields]="subjectFormField"
+      [object]="subjectInterface"
+    ></app-new-form>
+  </div>
+  <div mat-dialog-actions align="end">
+    <div>
+      <button
+        *ngIf="data.action === 'update'"
+        mat-raised-button
+        color="warn"
+        [disabled]="!subjectDetails.form.valid || saving"
+        (click)="onDelete()"
+      >
+        Delete
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!subjectDetails.form.valid || saving"
+        (click)="onSubmit()"
+      >
+        {{ saving ? "Saving..." : "Submit" }}
+      </button>
+    </div>
+  </div>
+</ng-container>

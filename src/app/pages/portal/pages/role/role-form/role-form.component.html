@@ -1,0 +1,130 @@
+<h3 mat-dialog-title>
+  {{ title }}
+  <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+    close
+  </mat-icon>
+</h3>
+<div mat-dialog-content>
+  <mat-stepper [linear]="true" #stepper>
+    <mat-step [stepControl]="roleDetails.form">
+      <ng-template matStepLabel>ROLE DETAILS</ng-template>
+      <app-new-form
+        #roleDetails
+        [formfields]="roleFormField"
+        [object]="roleInterface"
+      ></app-new-form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>ACCESSIBLE MODULES</ng-template>
+      <mat-checkbox
+        color="primary"
+        [checked]="checkedAll"
+        [indeterminate]="!checkedAll ? someChecked : false"
+        (change)="checkAll($event, accesses)"
+      >
+        <b class="upper">Check All</b>
+      </mat-checkbox>
+      <div *ngFor="let access of accesses; let i = index" class="py-2">
+        <mat-card class="pb-1">
+          <div class="main-module">
+            <mat-card-subtitle>
+              <div class="flex justify-content-between">
+                <mat-checkbox
+                  [disabled]="access.label === 'Dashboard'"
+                  color="primary"
+                  [(ngModel)]="access.hasAccess"
+                  (change)="check(access)"
+                >
+                  <b class="upper">{{ access.label }}</b>
+                </mat-checkbox>
+                <mat-icon *ngIf="!access.subaccess">
+                  {{ access.metadata }}
+                </mat-icon>
+              </div>
+            </mat-card-subtitle>
+            <ng-container
+              *ngIf="
+                access.subaccess?.length && access.hasAccess && access.route
+              "
+            >
+              <mat-card-content>
+                <div class="grid">
+                  <div
+                    class="col-12 px-3"
+                    *ngFor="let childInitial of access.subaccess"
+                  >
+                    <div class="flex justify-content-between">
+                      <mat-checkbox
+                        color="primary"
+                        [(ngModel)]="childInitial.hasAccess"
+                        (change)="check(childInitial)"
+                      >
+                        {{ childInitial.label }}
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </ng-container>
+            <div
+              class="mt-3"
+              *ngIf="
+                access.subaccess?.length && access.hasAccess && !access.route
+              "
+            >
+              <div *ngFor="let child of access.subaccess">
+                <div class="p-3 mb-2 sub-module">
+                  <div class="flex justify-content-between">
+                    <mat-checkbox
+                      color="primary"
+                      [(ngModel)]="child.hasAccess"
+                      (change)="check(child)"
+                      ><b style="font-weight: 500">
+                        {{ child.label }}
+                      </b>
+                    </mat-checkbox>
+                    <mat-icon>{{ child.metadata }}</mat-icon>
+                  </div>
+                  <ng-container
+                    *ngIf="child.subaccess?.length && child.hasAccess"
+                  >
+                    <mat-divider class="my-3"></mat-divider>
+                    <div class="grid">
+                      <div
+                        class="col-12 px-3"
+                        *ngFor="let childFinal of child.subaccess"
+                      >
+                        <div class="flex justify-content-between">
+                          <mat-checkbox
+                            color="primary"
+                            [(ngModel)]="childFinal.hasAccess"
+                            (change)="check(childFinal)"
+                          >
+                            {{ childFinal.label }}
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</div>
+<div mat-dialog-actions align="end">
+  <div>
+    <button mat-raised-button (click)="onCancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="isDisabled()"
+      (click)="onSubmit()"
+    >
+      Submit
+    </button>
+  </div>
+</div>

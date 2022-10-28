@@ -1,0 +1,673 @@
+<form [formGroup]="form" style="margin-top: 0.5rem">
+  <div class="grid form-container">
+    <ng-container *ngFor="let formfield of formfields">
+      <ng-container
+        *ngIf="formfield.showIf ? evaluate(formfield.showIf, form.value) : true"
+      >
+        <div class="col-12" *ngIf="formfield.section && formfield.show">
+          <h3>
+            {{ formfield.section }}
+            <span
+              *ngIf="
+                formfield.sectionTooltip && formfield.sectionTooltip.length > 0
+              "
+              ><mat-icon [matMenuTriggerFor]="sectionTooltipDisplay"
+                >help</mat-icon
+              ></span
+            >
+          </h3>
+          <mat-menu #sectionTooltipDisplay="matMenu">
+            <mat-list>
+              <mat-list-item *ngFor="let tip of formfield.sectionTooltip">{{
+                tip
+              }}</mat-list-item>
+            </mat-list>
+          </mat-menu>
+          <mat-divider></mat-divider>
+        </div>
+
+        <ng-container *ngFor="let field of formfield.items" class="col-12">
+          <!-- FORM ARRAY -->
+          <ng-container
+            *ngIf="field.showIf ? evaluate(field.showIf, form.value) : true"
+          >
+            <div class="col-12 array-container" *ngIf="field.items">
+              <div class="col-12" style="padding-bottom: 0">
+                <div class="grid">
+                  <div class="col-6">
+                    <h3>{{ field.label }}</h3>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: flex-start;
+                    "
+                    class="col-6"
+                  >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      style="margin-bottom: 0rem"
+                      (click)="addControls(field.fcname, field.items)"
+                    >
+                      <mat-icon>add</mat-icon>Add {{ field.label }}
+                    </button>
+                  </div>
+                </div>
+                <mat-divider></mat-divider>
+              </div>
+              <div [formArrayName]="field.fcname">
+                <section
+                  style="position: relative"
+                  *ngFor="let form of getControls(field.fcname); let i = index"
+                  [formGroupName]="i"
+                >
+                  <ng-container *ngFor="let temp of field.items">
+                    <ng-container
+                      *ngIf="
+                        temp.show
+                          ? temp.show
+                          : evaluate(temp.showIf, form.value)
+                      "
+                    >
+                      <mat-form-field
+                        *ngIf="temp.type === 'text' && !temp.isFormArray"
+                        [appearance]="temp.appearance"
+                        class="{{ css[field.fcname] }}"
+                      >
+                        <mat-label>{{ temp.label }} {{ i + 1 }}</mat-label>
+                        <input matInput [formControlName]="temp.fcname" />
+                        <mat-error
+                          *ngIf="
+                            getControls(field.fcname)
+                              [i].get(temp.fcname)
+                              ?.hasError('required')
+                          "
+                        >
+                          {{ temp.label }} is required
+                        </mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field
+                        *ngIf="temp.type === 'textarea' && !temp.isFormArray"
+                        [appearance]="temp.appearance"
+                        class="{{ css[field.fcname] }} {{ field.css }}"
+                      >
+                        <mat-label>{{ temp.label }} {{ i + 1 }}</mat-label>
+                        <textarea
+                          matInput
+                          [formControlName]="temp.fcname"
+                          [rows]="temp.rowspan"
+                        >
+                        </textarea>
+                        <mat-error
+                          *ngIf="
+                            getControls(field.fcname)
+                              [i].get(temp.fcname)
+                              ?.hasError('required')
+                          "
+                        >
+                          {{ temp.label }} is required
+                        </mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field
+                        *ngIf="temp.type === 'number'"
+                        class="{{ css[field.fcname] }}"
+                      >
+                        <mat-label>{{ temp.label }} {{ i + 1 }}</mat-label>
+                        <input
+                          matInput
+                          type="text"
+                          [readonly]="field.readonly"
+                          [formControlName]="temp.fcname"
+                          (keypress)="numberInputOnly($event)"
+                        />
+                      </mat-form-field>
+
+                      <mat-form-field
+                        *ngIf="temp.type == 'select' && !temp.isFormArray"
+                        [floatLabel]="!temp.choices?.length ? 'always' : 'auto'"
+                        [appearance]="temp.appearance"
+                        class="{{ css[field.fcname] }}"
+                      >
+                        <mat-label>{{ temp.label }} {{ i + 1 }}</mat-label>
+                        <mat-select
+                          [formControlName]="temp.fcname"
+                          [compareWith]="compareFn"
+                          [placeholder]="
+                            !temp.choices?.length ? 'Loading...' : ''
+                          "
+                        >
+                          <mat-option
+                            *ngFor="let item of temp.choices"
+                            [value]="
+                              field.choiceValue
+                                ? utilService.deepFind(item, temp.choiceValue)
+                                : item
+                            "
+                          >
+                            {{
+                              field.choiceLabel
+                                ? utilService.deepFind(item, temp.choiceLabel)
+                                : item
+                            }}
+                          </mat-option>
+                        </mat-select>
+
+                        <mat-error
+                          *ngIf="
+                            getControls(field.fcname)
+                              [i].get(temp.fcname)
+                              ?.hasError('required')
+                          "
+                        >
+                          {{ temp.label }} is required
+                        </mat-error>
+                      </mat-form-field>
+
+                      <!-- CHILD FORM ARRAYS -->
+                      <div
+                        class="col-12 array-container-2"
+                        style="padding: 0"
+                        *ngIf="temp.items"
+                      >
+                        <div
+                          class="col-12"
+                          style="padding-bottom: 0"
+                          *ngIf="
+                            temp.show
+                              ? temp.show
+                              : evaluate(temp.showIf, form.value)
+                          "
+                        >
+                          <button
+                            mat-flat-button
+                            color="primary"
+                            style="margin-bottom: 0rem; margin-top: 0.5rem"
+                            (click)="
+                              addControls2(
+                                temp.fcname,
+                                field.fcname,
+                                field.items,
+                                i
+                              )
+                            "
+                          >
+                            <mat-icon>add</mat-icon>Add {{ temp.label }}
+                          </button>
+                        </div>
+                        <div [formArrayName]="temp.fcname">
+                          <section
+                            *ngFor="
+                              let formt of getControls2(
+                                temp.fcname,
+                                field.fcname,
+                                i
+                              );
+                              let ind = index
+                            "
+                            [formGroupName]="ind"
+                          >
+                            <ng-container *ngFor="let alt of temp.items">
+                              <ng-container
+                                *ngIf="
+                                  alt.show
+                                    ? alt.show
+                                    : evaluate(alt.showIf, form.value) ||
+                                      evaluate(alt.showIf, formt.value)
+                                "
+                              >
+                                <mat-form-field
+                                  *ngIf="
+                                    alt.type === 'text' && !alt.isFormArray
+                                  "
+                                  [appearance]="alt.appearance"
+                                  class="{{ css[field.fcname] }}"
+                                >
+                                  <mat-label
+                                    >{{ alt.label }} {{ ind + 1 }}</mat-label
+                                  >
+                                  <input
+                                    matInput
+                                    [formControlName]="alt.fcname"
+                                  />
+                                </mat-form-field>
+                                <mat-form-field
+                                  *ngIf="alt.type === 'number'"
+                                  class="{{ css[field.fcname] }}"
+                                >
+                                  <mat-label
+                                    >{{ alt.label }} {{ ind + 1 }}</mat-label
+                                  >
+                                  <input
+                                    matInput
+                                    type="text"
+                                    [formControlName]="alt.fcname"
+                                    (keypress)="numberInputOnly($event)"
+                                  />
+                                </mat-form-field>
+                                <mat-form-field
+                                  *ngIf="
+                                    alt.type == 'select' && !alt.isFormArray
+                                  "
+                                  [floatLabel]="
+                                    !alt.choices?.length ? 'always' : 'auto'
+                                  "
+                                  [appearance]="alt.appearance"
+                                  class="{{ css[field.fcname] }}"
+                                >
+                                  <mat-label
+                                    >{{ alt.label }} {{ ind + 1 }}</mat-label
+                                  >
+                                  <mat-select
+                                    [formControlName]="alt.fcname"
+                                    [compareWith]="compareFn"
+                                    [placeholder]="
+                                      !alt.choices?.length ? 'Loading...' : ''
+                                    "
+                                  >
+                                    <mat-option
+                                      *ngFor="let item of alt.choices"
+                                      [value]="
+                                        field.choiceValue
+                                          ? utilService.deepFind(
+                                              item,
+                                              alt.choiceValue
+                                            )
+                                          : item
+                                      "
+                                    >
+                                      {{
+                                        field.choiceLabel
+                                          ? utilService.deepFind(
+                                              item,
+                                              alt.choiceLabel
+                                            )
+                                          : item
+                                      }}
+                                    </mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </ng-container>
+                            </ng-container>
+                            <button
+                              mat-icon-button
+                              class="col"
+                              color="warn"
+                              *ngIf="ind > 0"
+                              matTooltip="Remove"
+                              (click)="
+                                deleteControl2(
+                                  temp.fcname,
+                                  ind,
+                                  field.fcname,
+                                  i
+                                )
+                              "
+                            >
+                              <mat-icon>delete_forever</mat-icon>
+                            </button>
+                          </section>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </ng-container>
+                  <button
+                    mat-mini-fab
+                    class="col"
+                    style="position: absolute; right: 0.5rem; top: 0.1rem"
+                    color="warn"
+                    matTooltip="Remove {{ field.label }} {{ i }}"
+                    (click)="deleteControl(field.fcname, i)"
+                  >
+                    <mat-icon>delete_forever</mat-icon>
+                  </button>
+                  <mat-divider style="margin-top: 1rem"></mat-divider>
+                </section>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- FORM GROUP -->
+          <ng-container *ngIf="!field.items">
+            <div
+              *ngIf="field.show"
+              style="padding: 0"
+              class="{{ css[field.fcname] }}"
+            >
+              <mat-form-field
+                *ngIf="field.type === 'text'"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <ng-container *ngIf="!field.noFormat">
+                  <input
+                    matInput
+                    type="text"
+                    [formControlName]="field.fcname"
+                    [readonly]="field.readonly"
+                    [placeholder]="
+                      field.placeholder ? field.placeholder : field.label
+                    "
+                  />
+                </ng-container>
+                <ng-container *ngIf="field.noFormat">
+                  <input
+                    matInput
+                    type="text"
+                    [formControlName]="field.fcname"
+                    [readonly]="field.readonly"
+                    [placeholder]="
+                      field.placeholder ? field.placeholder : field.label
+                    "
+                  />
+                </ng-container>
+
+                <p matPrefix>{{ field.prefix }}</p>
+                <button
+                  *ngIf="form.controls[field.fcname].value && field.addCopyText"
+                  matSuffix
+                  mat-icon-button
+                  (click)="copyMessage(form.controls[field.fcname].value)"
+                >
+                  <mat-icon
+                    matTooltip="Copy to clipboard"
+                    style="color: rgb(71, 71, 71)"
+                  >
+                    content_paste
+                  </mat-icon>
+                </button>
+
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')"
+                  >{{ field.label }} is required</mat-error
+                >
+              </mat-form-field>
+
+              <mat-form-field
+                *ngIf="field.type === 'number'"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+
+                <input
+                  matInput
+                  type="text"
+                  [formControlName]="field.fcname"
+                  [maxLength]="field.maxLength ? field.maxLength : 999"
+                  [minLength]="field.minLength ? field.minLength : 0"
+                  [readonly]="field.readonly"
+                  (keypress)="numberInputOnly($event, field.withZero)"
+                />
+                <span matSuffix *ngIf="field.suffix">{{ field.suffix }}</span>
+
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')"
+                  >{{ field.label }} is required</mat-error
+                >
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('minlength')"
+                  >{{ field.label }} minimum of {{ field.minLength }}</mat-error
+                >
+              </mat-form-field>
+
+              <mat-form-field
+                floatLabel="always"
+                *ngIf="field.type === 'mobileNumber'"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  [placeholder]="
+                    field.placeholder ? field.placeholder : field.label
+                  "
+                  [formControlName]="field.fcname"
+                  (keypress)="numberInputOnly($event)"
+                  [readonly]="field.readonly"
+                  maxlength="10"
+                />
+                <span matPrefix class="mobile-prefix">(+63)&nbsp;</span>
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')"
+                  >{{ field.label }} is required</mat-error
+                >
+                <mat-hint *ngIf="field.hint">
+                  {{ field.hint }}
+                </mat-hint>
+                <mat-error
+                  *ngIf="
+                    form.get(field.fcname)?.hasError('pattern') ||
+                    form.get(field.fcname)?.hasError('minlength')
+                  "
+                  >Enter valid mobile number</mat-error
+                >
+              </mat-form-field>
+
+              <mat-form-field
+                *ngIf="field.type === 'email'"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <input matInput type="text" [formControlName]="field.fcname" />
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')"
+                  >{{ field.label }} is required</mat-error
+                >
+                <mat-error
+                  *ngIf="
+                    form.get(field.fcname)?.hasError('pattern') ||
+                    form.get(field.fcname)?.hasError('email')
+                  "
+                >
+                  Enter valid email
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field
+                *ngIf="field.type === 'date'"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  [matDatepicker]="picker"
+                  [formControlName]="field.fcname"
+                  [readonly]="field.readonly || false"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #picker
+                  [disabled]="field.disabled ? field.disabled : false"
+                  [touchUi]="true"
+                >
+                </mat-datepicker>
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')">
+                  Please pick a date
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field
+                floatLabel="always"
+                *ngIf="field.type === 'date-range'"
+                appearance="outline"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <mat-date-range-input [rangePicker]="picker">
+                  <input
+                    matStartDate
+                    placeholder="Start date"
+                    [formControlName]="field.fcname"
+                    readonly
+                  />
+                  <input
+                    matEndDate
+                    placeholder="End date"
+                    [formControlName]="field.fcname"
+                    readonly
+                  />
+                </mat-date-range-input>
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+              </mat-form-field>
+
+              <mat-form-field
+                floatLabel="always"
+                class="full-width"
+                *ngIf="field.type == 'textarea'"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <textarea
+                  matInput
+                  [formControlName]="field.fcname"
+                  [rows]="field.rowspan"
+                  style="max-height: 10rem; min-height: 2rem; overflow-y: auto"
+                ></textarea>
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')">
+                  {{ field.label }} is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field
+                *ngIf="field.type == 'select'"
+                [floatLabel]="!field.choices?.length ? 'always' : 'auto'"
+                class="full-width"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <mat-select
+                  [multiple]="field.multipleSelect"
+                  [formControlName]="field.fcname"
+                  [compareWith]="compareFn"
+                  [placeholder]="!field.choices?.length ? 'Loading...' : ''"
+                >
+                  <mat-option
+                    *ngFor="let item of field.choices"
+                    [value]="
+                      field.choiceValue
+                        ? utilService.deepFind(item, field.choiceValue)
+                        : item
+                    "
+                  >
+                    {{
+                      field.choiceLabel
+                        ? utilService.deepFind(item, field.choiceLabel)
+                        : item
+                    }}
+                  </mat-option>
+                </mat-select>
+
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')">
+                  You must select one.
+                </mat-error>
+                <button
+                  *ngIf="
+                    form.get(field.fcname)?.value &&
+                    field.clearBtn &&
+                    !form.get(field.fcname)?.disabled
+                  "
+                  mat-button
+                  color="warn"
+                  matSuffix
+                  mat-icon-button
+                  (click)="
+                    $event.stopPropagation();
+                    form.get(field.fcname)?.setValue('')
+                  "
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-form-field
+                *ngIf="field.type == 'autocomplete'"
+                [floatLabel]="!field.choices?.length ? 'always' : 'auto'"
+                class="full-width"
+                [appearance]="field.appearance"
+                class="col-12"
+                style="padding: 0 0.3rem"
+              >
+                <mat-label>{{ field.label }}</mat-label>
+                <input
+                  matInput
+                  [formControlName]="field.fcname"
+                  [matAutocomplete]="formAuto"
+                />
+
+                <mat-autocomplete
+                  #formAuto="matAutocomplete"
+                  [displayWith]="autoCompleteDisplay.bind(this, field.fcname)"
+                >
+                  <mat-option
+                    (onSelectionChange)="
+                      autocompleteOnClick(item, field.fcname)
+                    "
+                    *ngFor="let item of field.filteredChoices | async"
+                    [value]="
+                      field.choiceValue
+                        ? utilService.deepFind(item, field.choiceValue)
+                        : item
+                    "
+                    [ngClass]="field.subLabel ? 'multiline-mat-option' : ''"
+                  >
+                    <div>
+                      {{
+                        field.choiceLabel
+                          ? setChoiceLabel(item, field.choiceLabel)
+                          : item
+                      }}
+                      <small
+                        style="color: gray"
+                        *ngIf="checkIfArray(field.choiceLabel)"
+                        >({{ setSmallValue(item, field.choiceLabel) }})</small
+                      >
+                    </div>
+
+                    <p *ngIf="field.subLabel" class="sub-label">
+                      {{ utilService.deepFind(item, field.subLabel) }}
+                    </p>
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="form.get(field.fcname)?.hasError('required')">
+                  You must select one.
+                </mat-error>
+              </mat-form-field>
+
+              <mat-checkbox
+                *ngIf="field.type == 'checkbox'"
+                [formControlName]="field.fcname"
+                color="accent"
+                style="align-self: center"
+              >
+                {{ field.label }}
+              </mat-checkbox>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+    <!-- SLOT DO NOT REMOVE -->
+    <div class="col-12 form-slot">
+      <ng-content select="[extra-form]"></ng-content>
+    </div>
+  </div>
+</form>

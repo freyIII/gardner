@@ -1,0 +1,72 @@
+<ng-container>
+  <h3 mat-dialog-title>
+    {{ title }}
+    <mat-icon (click)="onCancel()" class="close-btn" color="warn">
+      close
+    </mat-icon>
+  </h3>
+
+  <div mat-dialog-content>
+    <app-new-form
+      #strandDetails
+      [formfields]="strandFormField"
+      [object]="strandInterface"
+    ></app-new-form>
+    <h3 style="display: flex; align-items: center">
+      Subjects
+      <button class="fab" mat-mini-fab color="primary" (click)="addSubject()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </h3>
+    <ng-container *ngIf="subjArray.length">
+      <ng-container *ngFor="let subject of subjArray; let i = index">
+        <div
+          style="
+            position: relative;
+            display: flex;
+            width: 100%;
+            align-items: center;
+          "
+        >
+          <app-autocomplete-api
+            style="width: 90%"
+            [config]="subject.config"
+            [field]="subject.field"
+            (onControlChange)="autocompleteListener($event, i)"
+          ></app-autocomplete-api>
+          <div style="width: 10%; padding-bottom: 1.34375em">
+            <button
+              *ngIf="i > 0"
+              class="fab"
+              mat-mini-fab
+              color="warn"
+              (click)="removeSubject(i)"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div mat-dialog-actions align="end">
+    <div>
+      <button
+        *ngIf="data.action === 'update'"
+        mat-raised-button
+        color="warn"
+        (click)="onDelete()"
+      >
+        Delete
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="isDisabled()"
+        (click)="onSubmit()"
+      >
+        {{ saving ? "Saving..." : "Submit" }}
+      </button>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,14 @@
+@import "/src/assets/scss/variable.scss";
+
+:host ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: $primary;
+}
+:host
+  ::ng-deep
+  .mat-form-field-appearance-outline.mat-focused
+  .mat-form-field-outline-thick {
+  color: $primary !important;
+}
+:host ::ng-deep .mat-form-field-label {
+  color: $primary !important;
+}
