@@ -20,7 +20,7 @@ export class AppComponent {
         this.show = true;
       },
       (err) => {
-        // localStorage.setItem('URL', REMOTE_URL);
+        localStorage.setItem('URL', REMOTE_URL);
         this.show = true;
       }
     );
