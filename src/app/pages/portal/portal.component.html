@@ -90,17 +90,6 @@
         (click)="changeRoute(dashboard)"
       />
       <span class="header-spacer"></span>
-      <ngx-avatar
-        *ngIf="me"
-        bgColor="#f6f6f6"
-        fgColor="#3387c8"
-        [round]="true"
-        [name]="me.firstName"
-        size="40"
-        cornerRadius="5"
-        class="header-avatar"
-        [matMenuTriggerFor]="menu"
-      ></ngx-avatar>
       <mat-menu #menu="matMenu">
         <mat-card
           style="
