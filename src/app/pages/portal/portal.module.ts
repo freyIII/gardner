@@ -5,7 +5,6 @@ import { PortalRoutingModule } from './portal-routing.module';
 import { PortalComponent } from './portal.component';
 import { MaterialModule } from 'src/app/shared/material/material.module';
 import { ComponentsModule } from 'src/app/shared/components/components.module';
-import { AvatarModule } from 'ngx-avatar';
 import { DialogsModule } from 'src/app/shared/dialogs/dialogs.module';
 
 @NgModule({
@@ -15,7 +14,6 @@ import { DialogsModule } from 'src/app/shared/dialogs/dialogs.module';
     PortalRoutingModule,
     MaterialModule,
     ComponentsModule,
-    AvatarModule,
     DialogsModule,
   ],
 })
