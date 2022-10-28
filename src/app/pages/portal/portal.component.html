@@ -92,11 +92,11 @@
       <span class="header-spacer"></span>
       <ngx-avatar
         *ngIf="me"
-        name="{{ me.firstName }} {{ me.lastName }}"
         bgColor="#f6f6f6"
         fgColor="#3387c8"
+        [round]="true"
+        [name]="me.firstName"
         size="40"
-        [round]="false"
         cornerRadius="5"
         class="header-avatar"
         [matMenuTriggerFor]="menu"
