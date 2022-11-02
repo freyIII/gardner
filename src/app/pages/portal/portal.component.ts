@@ -16,6 +16,7 @@ import { USER_NAVS } from './portal.configs';
 import { User } from 'src/app/models/user.interface';
 import { setUser } from 'src/app/user/user.action';
 import { ChangePasswordComponent } from 'src/app/shared/dialogs/change-password/change-password.component';
+import { DialogAreYouSureComponent } from 'src/app/shared/dialogs/dialog-are-you-sure/dialog-are-you-sure.component';
 
 @Component({
   selector: 'app-portal',
@@ -109,6 +110,17 @@ export class PortalComponent implements OnInit {
     this.changeLabel.emit(nav);
     this.routeLabel = nav.label;
     if (nav.metadata) this.routeIcon = nav.metadata;
+  }
+
+  confirmLogout() {
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: { header: 'Before you proceed...', msg: 'logout' },
+      })
+      .afterClosed()
+      .subscribe((res) => {
+        if (res) this.logout();
+      });
   }
 
   logout() {

@@ -43,6 +43,7 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
+    this.loggingIn = true;
     this.auth.login(this.credentials.getRawValue()).subscribe(
       (res: any) => {
         if (

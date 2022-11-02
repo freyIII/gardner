@@ -4,10 +4,11 @@
   position: fixed;
   z-index: 999;
   background: rgb(161, 196, 251);
+  background: rgb(219, 219, 219);
   background: linear-gradient(
     0deg,
-    rgba(161, 196, 251, 1) 0%,
-    rgba(223, 230, 240, 1) 100%
+    rgba(219, 219, 219, 1) 0%,
+    rgba(15, 51, 73, 0.9) 100%
   );
   color: #fff;
   transition: 0.1s ease-in;
@@ -52,10 +53,11 @@ mat-sidenav-container {
     flex-direction: column;
     justify-content: center;
     text-align: center;
+    background: rgb(219, 219, 219);
     background: linear-gradient(
       0deg,
-      rgba(161, 196, 251, 1) 0%,
-      rgba(223, 230, 240, 1) 100%
+      rgba(219, 219, 219, 1) 0%,
+      rgba(15, 51, 73, 0.9) 100%
     );
     p {
       font-weight: 700;

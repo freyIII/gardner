@@ -1,3 +1,4 @@
+<app-loading *ngIf="loggingOut" [label]="'Logging out...'"></app-loading>
 <mat-sidenav-container autosize *ngIf="!loggingOut">
   <mat-sidenav #sidenav="matSidenav" mode="over" class="mat-elevation-z8">
     <div class="list-container">
@@ -74,6 +75,29 @@
         </div>
       </mat-list>
     </div>
+    <div>
+      <button
+        style="width: 100%; margin-bottom: 10px"
+        mat-raised-button
+        (click)="onChangePassword()"
+      >
+        <mat-icon>vpn_key</mat-icon>
+        <span>Change Password</span>
+      </button>
+      <button
+        style="
+          background: #f44336;
+          color: white;
+          width: 100%;
+          margin-bottom: 10px;
+        "
+        mat-raised-button
+        (click)="confirmLogout()"
+      >
+        <mat-icon>settings_power</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
   </mat-sidenav>
   <!-- HEADER -->
   <mat-sidenav-content>
@@ -89,35 +113,6 @@
         src="../../../assets/images/logo2.png"
         (click)="changeRoute(dashboard)"
       />
-      <span class="header-spacer"></span>
-      <mat-menu #menu="matMenu">
-        <mat-card
-          style="
-            text-align: center;
-            background: #f6f6f6;
-            border: none;
-            box-shadow: none;
-            padding-bottom: 0;
-          "
-        >
-          <mat-card-header>
-            <mat-card-title>
-              {{ me ? me.email.toUpperCase() : "" }}
-            </mat-card-title>
-            <mat-card-subtitle>
-              {{ me ? me.type.toUpperCase() : "" }}
-            </mat-card-subtitle>
-          </mat-card-header>
-        </mat-card>
-        <button mat-menu-item (click)="onChangePassword()">
-          <mat-icon>vpn_key</mat-icon>
-          <span>Change Password</span>
-        </button>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>settings_power</mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
     </mat-toolbar>
     <mat-toolbar class="lower-header">
       <p class="m-0" style="font-size: 16px">
