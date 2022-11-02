@@ -67,8 +67,17 @@
         <mat-icon color="warn" (click)="onRemove('room')">close</mat-icon>
       </div>
     </div>
+    <button
+      style="margin-top: 6px"
+      mat-mini-fab
+      color="primary"
+      (click)="download()"
+      [disabled]="!selectedSched"
+    >
+      <mat-icon>picture_as_pdf</mat-icon>
+    </button>
   </div>
-  <div class="col-8">
+  <div class="col-8" id="sched-div">
     <div class="flex justify-content-center grid grid-nogutter">
       <div
         class="col-1 justify-content-center justify-align-center"

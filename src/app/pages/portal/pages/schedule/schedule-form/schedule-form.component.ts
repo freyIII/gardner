@@ -1,12 +1,17 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Section } from 'src/app/models/form.interface';
 import { Professor } from 'src/app/models/professor.interface';
 import { Subject } from 'src/app/models/subject.interface';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NewFormComponent } from 'src/app/shared/components/new-form/new-form.component';
+import { DialogAreYouSureComponent } from 'src/app/shared/dialogs/dialog-are-you-sure/dialog-are-you-sure.component';
 import {
   MORNING_TIMES,
   AFTERNOOON_TIMES,
@@ -33,7 +38,8 @@ export class ScheduleFormComponent implements OnInit {
     private util: UtilService,
     private fb: FormBuilder,
     private sb: MatSnackBar,
-    private dialogRef: MatDialogRef<ScheduleFormComponent>
+    private dialogRef: MatDialogRef<ScheduleFormComponent>,
+    private dialog: MatDialog
   ) {
     this.title = this.data.title;
     this.professorDetails = this.util.deepCopy(this.data.form.professor);
@@ -53,46 +59,77 @@ export class ScheduleFormComponent implements OnInit {
   ngOnInit(): void {}
 
   onSave() {
-    let startTimeIndex: number;
-    let endTimeIndex: number;
-    let startTime = this.formGroup.get('startTime').value;
-    let endTime = this.formGroup.get('endTime').value;
-    if (this.data.shift === 'Morning') {
-      this.morningArray.forEach((arr, index) => {
-        if (arr === startTime) {
-          startTimeIndex = index;
-        }
-        if (arr === endTime) {
-          endTimeIndex = index;
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `add`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          let startTimeIndex: number;
+          let endTimeIndex: number;
+          let startTime = this.formGroup.get('startTime').value;
+          let endTime = this.formGroup.get('endTime').value;
+          if (this.data.shift === 'Morning') {
+            this.morningArray.forEach((arr, index) => {
+              if (arr === startTime) {
+                startTimeIndex = index;
+              }
+              if (arr === endTime) {
+                endTimeIndex = index;
+              }
+            });
+          } else {
+            this.afternoonArray.forEach((arr, index) => {
+              if (arr === startTime) {
+                startTimeIndex = index;
+              }
+              if (arr === endTime) {
+                endTimeIndex = index;
+              }
+            });
+          }
+          console.log(startTimeIndex, endTimeIndex);
+          if (startTimeIndex > endTimeIndex) {
+            this.sb.open('Error: End time is less than Start time', 'Okay', {
+              duration: 3500,
+              panelClass: ['failed'],
+            });
+          } else if (startTimeIndex === endTimeIndex) {
+            this.sb.open('Error: Start time is same as End time ', 'Okay', {
+              duration: 3500,
+              panelClass: ['failed'],
+            });
+          } else {
+            this.formGroup.getRawValue();
+            this.dialogRef.close(this.formGroup.getRawValue());
+          }
         }
       });
-    } else {
-      this.afternoonArray.forEach((arr, index) => {
-        if (arr === startTime) {
-          startTimeIndex = index;
-        }
-        if (arr === endTime) {
-          endTimeIndex = index;
-        }
-      });
-    }
-    console.log(startTimeIndex, endTimeIndex);
-    if (startTimeIndex > endTimeIndex) {
-      this.sb.open('Error: End time is less than Start time', 'Okay', {
-        duration: 3500,
-        panelClass: ['failed'],
-      });
-    } else if (startTimeIndex === endTimeIndex) {
-      this.sb.open('Error: Start time is same as End time ', 'Okay', {
-        duration: 3500,
-        panelClass: ['failed'],
-      });
-    } else {
-      this.formGroup.getRawValue();
-      this.dialogRef.close(this.formGroup.getRawValue());
-    }
   }
   onCancel() {
-    this.dialogRef.close();
+    if (this.formGroup.dirty) {
+      this.dialog
+        .open(DialogAreYouSureComponent, {
+          data: {
+            header: 'Before you proceed...',
+            msg:
+              this.data.action === 'add'
+                ? 'stop adding new schedule'
+                : `stop editing the details of ${this.data.form.name} `,
+          },
+        })
+        .afterClosed()
+        .subscribe((confirm: boolean) => {
+          if (confirm) {
+            this.dialogRef.close(false);
+          }
+        });
+    } else {
+      this.dialogRef.close(false);
+    }
   }
 }

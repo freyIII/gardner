@@ -219,3 +219,35 @@ export const SCHEDULE_COLUMNS: Array<Column> = [
     selected: true,
   },
 ];
+
+export const ROLE_COLUMNS: Array<Column> = [
+  {
+    title: 'Name',
+    breakpoint: 'xs',
+    path: 'name',
+    type: 'text',
+    selected: true,
+  },
+  {
+    title: 'Inserted By',
+    breakpoint: 'xs',
+    path: '_createdBy',
+    paths: ['_createdBy.firstName', '_createdBy.lastName'],
+    type: 'special',
+    selected: true,
+  },
+  {
+    title: 'Date Inserted',
+    breakpoint: 'xs',
+    path: 'createdAt',
+    type: 'date',
+    selected: true,
+  },
+  {
+    title: 'User Count',
+    breakpoint: 'xs',
+    path: 'nUsers',
+    type: 'number',
+    selected: true,
+  },
+];

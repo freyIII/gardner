@@ -1,5 +1,9 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialog,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Section } from 'src/app/models/form.interface';
 import { Subject } from 'src/app/models/subject.interface';
@@ -7,6 +11,7 @@ import { ApiService } from 'src/app/services/api/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { AutocompleteApi } from 'src/app/shared/components/autocomplete-api/autocomplete-api.component';
 import { NewFormComponent } from 'src/app/shared/components/new-form/new-form.component';
+import { DialogAreYouSureComponent } from 'src/app/shared/dialogs/dialog-are-you-sure/dialog-are-you-sure.component';
 import { SUBJECT_AUTOCOMPLETE_CONFIG } from '../../strand/strand-form/strand-form.configs';
 import { PROFESSOR_FORM } from './professor-form.configs';
 
@@ -66,7 +71,8 @@ export class ProfessorFormComponent implements OnInit {
     private dialogRef: MatDialogRef<ProfessorFormComponent>,
     private sb: MatSnackBar,
     private api: ApiService,
-    private util: UtilService
+    private util: UtilService,
+    private dialog: MatDialog
   ) {
     console.log(data.form);
     if (data.action === 'update') {
@@ -124,12 +130,24 @@ export class ProfessorFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.saving = true;
-    if (this.data.action === 'add') {
-      this.onAdd();
-    } else {
-      this.onUpdate();
-    }
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `${this.data.action} ${this.professorDetails.form.value.firstName} ${this.professorDetails.form.value.lastName}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.saving = true;
+          if (this.data.action === 'add') {
+            this.onAdd();
+          } else {
+            this.onUpdate();
+          }
+        }
+      });
   }
 
   onAdd() {
@@ -163,17 +181,50 @@ export class ProfessorFormComponent implements OnInit {
   }
 
   onDelete() {
-    this.sb.open(
-      `Deleting ${this.professorDetails.form.value.firstName} ${this.professorDetails.form.value.lastName}...`,
-      undefined
-    );
-    this.api.professor
-      .deleteProfessor(this.data.form._id)
-      .subscribe(this.apiObserver);
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `${this.data.action} ${this.data.form.firstName} ${this.data.form.lastName}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.sb.open(
+            `Deleting ${this.data.form.firstName} ${this.data.form.lastName}...`,
+            undefined
+          );
+          this.api.professor
+            .deleteProfessor(this.data.form._id)
+            .subscribe(this.apiObserver);
+        }
+      });
   }
 
   onCancel() {
-    if (!this.saving) this.dialogRef.close(false);
+    if (!this.saving) {
+      if (this.professorDetails.form.dirty) {
+        this.dialog
+          .open(DialogAreYouSureComponent, {
+            data: {
+              header: 'Before you proceed...',
+              msg:
+                this.data.action === 'add'
+                  ? 'stop adding new professor'
+                  : `stop editing the details of ${this.data.form.firstName} ${this.data.form.lastName} `,
+            },
+          })
+          .afterClosed()
+          .subscribe((confirm: boolean) => {
+            if (confirm) {
+              this.dialogRef.close(false);
+            }
+          });
+      } else {
+        this.dialogRef.close(false);
+      }
+    }
   }
 
   isDisabled() {

@@ -102,7 +102,6 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.saving = true;
     this.dialog
       .open(DialogAreYouSureComponent, {
         data: {
@@ -113,6 +112,7 @@ export class UserFormComponent implements OnInit {
       .afterClosed()
       .subscribe((confirm: boolean) => {
         if (confirm) {
+          this.saving = true;
           if (this.data.action === 'add') {
             this.onAdd();
           } else {
@@ -158,11 +158,26 @@ export class UserFormComponent implements OnInit {
   }
 
   onDelete() {
-    this.sb.open(
-      `Deleting ${this.userDetails.form.value.firstName} ${this.userDetails.form.value.lastName}...`,
-      undefined
-    );
-    this.api.user.deleteUser(this.data.form._id).subscribe(this.apiObserver);
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `delete ${this.data.form.firstName} ${this.data.form.lastName}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.saving = true;
+          this.sb.open(
+            `Deleting ${this.data.form.firstName} ${this.data.form.lastName}...`,
+            undefined
+          );
+          this.api.user
+            .deleteUser(this.data.form._id)
+            .subscribe(this.apiObserver);
+        }
+      });
   }
 
   onCancel() {

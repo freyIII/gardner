@@ -5,8 +5,8 @@ import { QueryParams } from 'src/app/models/queryparams.interface';
 import { Role } from 'src/app/models/role.interface';
 import { SharedTableConfig } from 'src/app/models/table.interface';
 import { ApiService } from 'src/app/services/api/api.service';
-import { ROOM_TABLE_CONFIG } from '../room/room.configs';
 import { RoleFormComponent } from './role-form/role-form.component';
+import { ROLE_TABLE_CONFIG } from './role.config';
 
 @Component({
   selector: 'app-role',
@@ -14,7 +14,7 @@ import { RoleFormComponent } from './role-form/role-form.component';
   styleUrls: ['./role.component.scss'],
 })
 export class RoleComponent implements OnInit {
-  tableConfig: SharedTableConfig = ROOM_TABLE_CONFIG;
+  tableConfig: SharedTableConfig = ROLE_TABLE_CONFIG;
   dataSource: Array<Role> = [];
   dataLength: number = 0;
 

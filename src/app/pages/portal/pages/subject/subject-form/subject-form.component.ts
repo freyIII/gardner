@@ -1,10 +1,15 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialog,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Section } from 'src/app/models/form.interface';
 import { ApiService } from 'src/app/services/api/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NewFormComponent } from 'src/app/shared/components/new-form/new-form.component';
+import { DialogAreYouSureComponent } from 'src/app/shared/dialogs/dialog-are-you-sure/dialog-are-you-sure.component';
 import { SUBJECT_FORM } from './subject-form.configs';
 
 @Component({
@@ -53,7 +58,8 @@ export class SubjectFormComponent implements OnInit {
     private dialogRef: MatDialogRef<SubjectFormComponent>,
     private sb: MatSnackBar,
     private api: ApiService,
-    private util: UtilService
+    private util: UtilService,
+    private dialog: MatDialog
   ) {
     if (data.action === 'update') {
       this.subjectInterface = this.util.deepCopy(data.form);
@@ -65,12 +71,24 @@ export class SubjectFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.saving = true;
-    if (this.data.action === 'add') {
-      this.onAdd();
-    } else {
-      this.onUpdate();
-    }
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `${this.data.action} ${this.subjectDetails.form.value.name}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.saving = true;
+          if (this.data.action === 'add') {
+            this.onAdd();
+          } else {
+            this.onUpdate();
+          }
+        }
+      });
   }
 
   onAdd() {
@@ -92,16 +110,47 @@ export class SubjectFormComponent implements OnInit {
   }
 
   onDelete() {
-    this.sb.open(
-      `Deleting ${this.subjectDetails.form.value.name}...`,
-      undefined
-    );
-    this.api.subject
-      .deleteSubject(this.data.form._id)
-      .subscribe(this.apiObserver);
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `delete ${this.data.form.name}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.saving = true;
+          this.sb.open(`Deleting ${this.data.form.name}...`, undefined);
+          this.api.subject
+            .deleteSubject(this.data.form._id)
+            .subscribe(this.apiObserver);
+        }
+      });
   }
 
   onCancel() {
-    if (!this.saving) this.dialogRef.close(false);
+    if (!this.saving) {
+      if (this.subjectDetails.form.dirty) {
+        this.dialog
+          .open(DialogAreYouSureComponent, {
+            data: {
+              header: 'Before you proceed...',
+              msg:
+                this.data.action === 'add'
+                  ? 'stop adding new subject'
+                  : `stop editing the details of ${this.data.form.name} `,
+            },
+          })
+          .afterClosed()
+          .subscribe((confirm: boolean) => {
+            if (confirm) {
+              this.dialogRef.close(false);
+            }
+          });
+      } else {
+        this.dialogRef.close(false);
+      }
+    }
   }
 }

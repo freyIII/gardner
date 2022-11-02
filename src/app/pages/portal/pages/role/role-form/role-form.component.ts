@@ -271,6 +271,29 @@ export class RoleFormComponent implements OnInit {
     this.api.role.createRole(body).subscribe(this.apiObserver);
   }
 
+  onDelete() {
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `delete ${this.roleDetails.form.value.name}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.saving = true;
+          this.sb.open(
+            `Deleting ${this.roleDetails.form.value.name}...`,
+            undefined
+          );
+          this.api.role
+            .deleteRole(this.data.form._id)
+            .subscribe(this.apiObserver);
+        }
+      });
+  }
+
   isDisabled() {
     if (!this.roleDetails) return true;
 

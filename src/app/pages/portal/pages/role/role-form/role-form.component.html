@@ -117,7 +117,9 @@
 </div>
 <div mat-dialog-actions align="end">
   <div>
-    <button mat-raised-button (click)="onCancel()">Cancel</button>
+    <button mat-raised-button [disabled]="saving" (click)="onDelete()">
+      Delete
+    </button>
     <button
       mat-raised-button
       color="primary"

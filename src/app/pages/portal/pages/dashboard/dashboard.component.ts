@@ -1,10 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { QueryParams } from 'src/app/models/queryparams.interface';
 import { Schedule } from 'src/app/models/schedule.interface';
 import { Strand } from 'src/app/models/strand.interface';
 import { ApiService } from 'src/app/services/api/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import {
   AutocompleteApi,
   AutocompleteApiComponent,
@@ -15,6 +18,7 @@ import {
   STRAND_AUTOCOMPLETE_CONFIG,
   ROOM_AUTOCOMPLETE_CONFIG,
 } from '../schedule/schedule-creator/schedule-creator.configs';
+import { E } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-dashboard',
@@ -50,10 +54,15 @@ export class DashboardComponent implements OnInit {
   loadSched: boolean = false;
   loading: boolean = false;
   scheds: Array<Schedule> = [];
+  generating: boolean = false;
 
   query: any = {};
 
-  constructor(private api: ApiService, private util: UtilService) {}
+  constructor(
+    private api: ApiService,
+    private util: UtilService,
+    private sb: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.getAllSchedule();
@@ -183,5 +192,29 @@ export class DashboardComponent implements OnInit {
     }
     this.weekArray = days;
     this.loadSched = false;
+  }
+
+  async download() {
+    this.generating = true;
+    var sbRef = this.sb.open('Generating PDF...');
+
+    let PDF = new jsPDF('l', 'mm', 'a4');
+
+    let DATA = document.getElementById('sched-div') as HTMLCanvasElement;
+    await html2canvas(DATA).then((canvas) => {
+      const FILEURI = canvas.toDataURL('image/png');
+      PDF.addImage(FILEURI, 'PNG', 0, 5, 280, 200);
+    });
+    let blob = PDF.output('blob');
+    let blobUrl = URL.createObjectURL(blob);
+    let iFrame: any = document.createElement('iframe');
+
+    iFrame.style.display = 'none';
+    iFrame.src = blobUrl;
+
+    document.body.appendChild(iFrame);
+    iFrame.contentWindow.print();
+    sbRef.dismiss();
+    this.generating = false;
   }
 }

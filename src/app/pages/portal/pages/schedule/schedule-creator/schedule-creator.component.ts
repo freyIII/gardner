@@ -15,6 +15,7 @@ import { Subject } from 'src/app/models/subject.interface';
 import { ApiService } from 'src/app/services/api/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { AutocompleteApi } from 'src/app/shared/components/autocomplete-api/autocomplete-api.component';
+import { DialogAreYouSureComponent } from 'src/app/shared/dialogs/dialog-are-you-sure/dialog-are-you-sure.component';
 import { ScheduleFormComponent } from '../schedule-form/schedule-form.component';
 import {
   STRAND_AUTOCOMPLETE_CONFIG,
@@ -307,11 +308,26 @@ export class ScheduleCreatorComponent implements OnInit {
   }
 
   onSave() {
-    if (this.data.action === 'add') {
-      this.onAdd();
-    } else {
-      this.onUpdate();
-    }
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `${this.data.action}  ${
+            this.scheduleFormGroup.get('name').value
+          }`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.saving = true;
+          if (this.data.action === 'add') {
+            this.onAdd();
+          } else {
+            this.onUpdate();
+          }
+        }
+      });
   }
 
   onAdd() {
@@ -357,10 +373,40 @@ export class ScheduleCreatorComponent implements OnInit {
   }
 
   onCancel() {
-    this.dialogRef.close();
+    if (!this.saving) {
+      if (this.scheduleFormGroup.dirty) {
+        this.dialog
+          .open(DialogAreYouSureComponent, {
+            data: {
+              header: 'Before you proceed...',
+              msg:
+                this.data.action === 'add'
+                  ? 'stop adding new schedule'
+                  : `stop editing the details of ${this.data.form.name} `,
+            },
+          })
+          .afterClosed()
+          .subscribe((confirm: boolean) => {
+            if (confirm) {
+              this.dialogRef.close(false);
+            }
+          });
+      } else {
+        this.dialogRef.close(false);
+      }
+    }
   }
 
   onDelete() {
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `delete ${this.data.form.name}`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {});
     this.sb.open(`Deleting ${this.data.form.value.name}...`, undefined);
     this.api.subject
       .deleteSubject(this.data.form._id)
@@ -368,23 +414,36 @@ export class ScheduleCreatorComponent implements OnInit {
   }
 
   onRemove(time: string) {
-    console.log(this.weekArray);
-    console.log(this.scheds);
-    for (let week of this.weekArray) {
-      for (let [key, value] of Object.entries(week.scheds)) {
-        if (key === time && typeof value === 'object') {
-          for (let [k, val] of Object.entries(value)) {
-            if (k === 'shift' && val === this.selectedShift) {
-              delete week.scheds[key];
+    this.dialog
+      .open(DialogAreYouSureComponent, {
+        data: {
+          header: 'Before you proceed...',
+          msg: `remove`,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirm: boolean) => {
+        if (confirm) {
+          for (let week of this.weekArray) {
+            for (let [key, value] of Object.entries(week.scheds)) {
+              if (key === time && typeof value === 'object') {
+                for (let [k, val] of Object.entries(value)) {
+                  if (k === 'shift' && val === this.selectedShift) {
+                    delete week.scheds[key];
+                  }
+                }
+              }
             }
           }
+          this.scheds.forEach((sched, index) => {
+            if (
+              sched.startTime === time &&
+              sched.shift === this.selectedShift
+            ) {
+              this.scheds.splice(index, 1);
+            }
+          });
         }
-      }
-    }
-    this.scheds.forEach((sched, index) => {
-      if (sched.startTime === time && sched.shift === this.selectedShift) {
-        this.scheds.splice(index, 1);
-      }
-    });
+      });
   }
 }
