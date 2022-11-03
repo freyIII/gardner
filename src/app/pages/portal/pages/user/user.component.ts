@@ -18,6 +18,7 @@ export class UserComponent implements OnInit {
   tableConfig: SharedTableConfig = USER_TABLE_CONFIG;
   dataSource: Array<User> = [];
   dataLength: number = 0;
+  rolesLength: number = 0;
   loading: boolean = true;
   saving: boolean = false;
 
@@ -40,10 +41,12 @@ export class UserComponent implements OnInit {
         console.log(response);
         this.dataSource = response.env.users;
         this.dataLength = response.total_docs;
+        this.rolesLength = response.total_roles;
         this.loading = false;
       },
       (err) => {
         this.sb.open('Error: ' + err.error.message, 'Okay', {
+          panelClass: ['failed'],
           duration: 5000,
         });
         this.loading = false;
@@ -65,15 +68,22 @@ export class UserComponent implements OnInit {
   }
 
   onAdd() {
-    this.dialog
-      .open(UserFormComponent, {
-        disableClose: true,
-        width: '50%',
-        data: { action: 'add', title: 'Add User' },
-      })
-      .afterClosed()
-      .subscribe((res) => {
-        if (res) this.fetchData(this.recentQuery);
+    if (this.rolesLength) {
+      this.dialog
+        .open(UserFormComponent, {
+          disableClose: true,
+          width: '50%',
+          data: { action: 'add', title: 'Add User' },
+        })
+        .afterClosed()
+        .subscribe((res) => {
+          if (res) this.fetchData(this.recentQuery);
+        });
+    } else {
+      this.sb.open('Error: No Role yet!', 'Okay', {
+        duration: 3500,
+        panelClass: ['failed'],
       });
+    }
   }
 }

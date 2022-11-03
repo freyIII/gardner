@@ -8,6 +8,8 @@ export interface ApiResponse<T> {
   status: ResponseStatus;
   msg?: string;
   total_docs?: number;
+  total_roles?: number;
+  total_subjects?: number;
   results?: number;
   env?: {
     [key: string]: T;

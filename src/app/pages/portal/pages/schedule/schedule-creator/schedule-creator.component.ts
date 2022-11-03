@@ -127,7 +127,6 @@ export class ScheduleCreatorComponent implements OnInit {
   ngOnInit(): void {}
 
   get(strand: Strand, yearLevel: string, semester) {
-    console.log(strand);
     this.query = {
       strand: {
         field: '_id',
@@ -203,11 +202,9 @@ export class ScheduleCreatorComponent implements OnInit {
       tempArr.push(value);
     }
     query.find = tempArr;
-    console.log(this.query);
     this.api.subject.getAllSubjects(query).subscribe(
       (res) => {
         this.subjects = res.env.subjects;
-        console.log(res.total_docs);
         if (res.total_docs) this.getProfessors();
         else this.loading = false;
       },
@@ -253,6 +250,7 @@ export class ScheduleCreatorComponent implements OnInit {
         width: '50%',
         data: {
           form: { professor, subject },
+          schedules: this.scheds,
           shift: this.scheduleFormGroup.get('shift').value,
           action: 'add',
           title: 'Create Schedule',
@@ -260,16 +258,12 @@ export class ScheduleCreatorComponent implements OnInit {
       })
       .afterClosed()
       .subscribe((res) => {
-        console.log(res);
         if (res) {
           this.scheds.push(res);
           this.loadSched = true;
           this._getWeekArraySched();
         }
       });
-  }
-  isDisabled() {
-    return false;
   }
 
   _getWeekArraySched() {
@@ -279,6 +273,15 @@ export class ScheduleCreatorComponent implements OnInit {
 
       for (let sched of this.scheds) {
         if (array.day === sched.day) {
+          let conflictTo = this.conflictExist(
+            sched.startTime,
+            sched.endsTime,
+            sched._professor,
+            sched.shift
+          );
+          if (conflictTo) {
+            sched['conflict'] = conflictTo;
+          }
           if (sched.shift === 'Morning') {
             let startTimeIndex = this.morningArray.indexOf(sched.startTime);
             let endTimeIndex = this.morningArray.indexOf(sched.endTime);
@@ -297,12 +300,12 @@ export class ScheduleCreatorComponent implements OnInit {
           }
         }
       }
-
       days.push({
         day: array.day,
         scheds: scheds,
       });
     }
+
     this.weekArray = days;
     this.loadSched = false;
   }
@@ -341,13 +344,11 @@ export class ScheduleCreatorComponent implements OnInit {
       sched._subject = sched._subject._id;
     }
 
-    console.log(schedsCopy);
     let body = {
       ...this.scheduleFormGroup.getRawValue(),
       scheds: schedsCopy,
     };
 
-    console.log(body);
     this.api.schedule.createSchedule(body).subscribe(this.apiObserver);
   }
 
@@ -366,7 +367,6 @@ export class ScheduleCreatorComponent implements OnInit {
       ...this.scheduleFormGroup.getRawValue(),
       scheds: schedsCopy,
     };
-    console.log(body);
     this.api.schedule
       .updateSchedule(this.data.form._id, body)
       .subscribe(this.apiObserver);
@@ -445,5 +445,89 @@ export class ScheduleCreatorComponent implements OnInit {
           });
         }
       });
+  }
+
+  conflictExist(
+    startTime: string,
+    endTime: string,
+    professor: Professor,
+    shift: string
+  ) {
+    for (let data of this.data.dataSource) {
+      if (this.data.action === 'update') {
+        if (data._id !== this.data.form._id) {
+          return this.getConf(startTime, endTime, shift, data, professor);
+        }
+      } else {
+        return this.getConf(startTime, endTime, shift, data, professor);
+      }
+    }
+    return false;
+  }
+
+  getConf(
+    startTime: string,
+    endTime: string,
+    shift: string,
+    data: any,
+    professor: Professor
+  ) {
+    for (let sched of data.scheds) {
+      let existingStartTimeIndex: number;
+      let existingEndTimeIndex: number;
+      let startTimeIndex: number;
+      let endTimeIndex: number;
+      if (sched._professor._id === professor._id) {
+        if (shift === 'Morning') {
+          this.morningArray.forEach((arr, index) => {
+            if (arr === startTime) {
+              startTimeIndex = index;
+            }
+            if (arr === sched.startTime) {
+              existingStartTimeIndex = index;
+            }
+            if (arr === sched.endTime) {
+              existingEndTimeIndex = index;
+            }
+            if (arr === endTime) {
+              endTimeIndex = index;
+            }
+          });
+        } else {
+          this.afternoonArray.forEach((arr, index) => {
+            if (arr === startTime) {
+              startTimeIndex = index;
+            }
+            if (arr === sched.startTime) {
+              existingStartTimeIndex = index;
+            }
+            if (arr === sched.endsTime) {
+              existingEndTimeIndex = index;
+            }
+            if (arr === endTime) {
+              endTimeIndex = index;
+            }
+          });
+        }
+
+        if (
+          (startTimeIndex >= existingStartTimeIndex &&
+            startTimeIndex <= existingEndTimeIndex) ||
+          (endTimeIndex > existingStartTimeIndex &&
+            endTimeIndex <= existingEndTimeIndex)
+        ) {
+          return data;
+        }
+      }
+    }
+    return false;
+  }
+
+  isDisabled() {
+    for (let sched of this.scheds) {
+      if (sched.conflict) return true;
+    }
+
+    return false;
   }
 }

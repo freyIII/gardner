@@ -18,6 +18,7 @@ export class ProfessorComponent implements OnInit {
   tableConfig: SharedTableConfig = PROFESSOR_TABLE_CONFIG;
   dataSource: Array<Professor> = [];
   dataLength: number = 0;
+  subjectsLength: number = 0;
 
   loading: boolean = true;
   saving: boolean = false;
@@ -40,6 +41,7 @@ export class ProfessorComponent implements OnInit {
       (response) => {
         this.dataSource = response.env.professors;
         this.dataLength = response.total_docs;
+        this.subjectsLength = response.total_subjects;
         this.loading = false;
       },
       (err) => {
@@ -65,15 +67,22 @@ export class ProfessorComponent implements OnInit {
   }
 
   onAdd() {
-    this.dialog
-      .open(ProfessorFormComponent, {
-        disableClose: true,
-        width: '50%',
-        data: { action: 'add', title: 'Add User' },
-      })
-      .afterClosed()
-      .subscribe((res) => {
-        if (res) this.fetchData(this.recentQuery);
+    if (this.subjectsLength) {
+      this.dialog
+        .open(ProfessorFormComponent, {
+          disableClose: true,
+          width: '50%',
+          data: { action: 'add', title: 'Add User' },
+        })
+        .afterClosed()
+        .subscribe((res) => {
+          if (res) this.fetchData(this.recentQuery);
+        });
+    } else {
+      this.sb.open('Error: No Subject yet!', 'Okay', {
+        duration: 3500,
+        panelClass: ['failed'],
       });
+    }
   }
 }

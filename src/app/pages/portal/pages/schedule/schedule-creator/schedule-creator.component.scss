@@ -103,6 +103,26 @@ $border-gray: rgb(204, 204, 204);
   top: 0%;
   overflow-y: hidden;
 }
+
+.event-others {
+  background-color: #bf2315 !important;
+  border: none;
+  width: 100%;
+  z-index: 999;
+  border-radius: 5px;
+  text-align: left;
+  padding: 0 0.5rem;
+  font-size: 7px;
+  color: white;
+  margin: auto;
+  border: 1px solid #fff;
+  overflow-x: hidden;
+  text-overflow: clip;
+  position: relative;
+  top: 0%;
+  overflow-y: hidden;
+}
+
 .event-me:hover {
   box-shadow: 1px 2px 13px 0px rgba(34, 85, 160, 0.5);
 }

@@ -1,102 +1,111 @@
 <app-loading *ngIf="loggingOut" [label]="'Logging out...'"></app-loading>
 <mat-sidenav-container autosize *ngIf="!loggingOut">
   <mat-sidenav #sidenav="matSidenav" mode="over" class="mat-elevation-z8">
-    <div class="list-container">
-      <mat-list style="padding-top: 0">
-        <div class="headerSideNav">
+    <div class="list-container" style="height: 100%">
+      <mat-list style="padding-top: 0; height: 100%">
+        <div class="headerSideNav" style="height: 20%">
           <img src="../../../assets/images/logo.png" />
         </div>
 
         <!-- Nav List -->
-        <div style="padding: 12px">
-          <ng-container *ngFor="let item of navigation">
-            <!-- SOLO ITEM -->
-            <ng-container *ngIf="item.route">
-              <mat-list-item
-                [routerLink]="[item.route]"
-                (click)="changeRoute(item); sidenav.toggle()"
-                routerLinkActive="router-active-link"
-              >
-                <mat-icon color="primary" mat-list-icon>
-                  {{ item.metadata }}
-                </mat-icon>
-                {{ item.label }}
-              </mat-list-item>
-            </ng-container>
-
-            <ng-container *ngIf="!item.route && !item.subaccess?.length">
-              <mat-list-item class="inactive">
-                <mat-icon color="primary" mat-list-icon>
-                  {{ item.metadata }}
-                </mat-icon>
-                {{ item.label }}
-              </mat-list-item>
-            </ng-container>
-
-            <!-- WITH CHILD NAV -->
-            <div class="my-4" *ngIf="!item.route && item.subaccess?.length">
-              <p
-                style="
-                  height: auto;
-                  line-height: 10px;
-                  font-size: 10px;
-                  padding-left: 0.3rem;
-                  padding-right: 0.3rem;
-                  padding-bottom: 0;
-                  letter-spacing: 0.1rem;
-                  opacity: 0.7;
-                  text-align: left;
-                "
-                mat-subheader
-              >
-                {{ item.label }}
-              </p>
-              <ng-container *ngFor="let child of item.subaccess">
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 80%;
+          "
+        >
+          <div style="padding: 12px">
+            <ng-container *ngFor="let item of navigation">
+              <!-- SOLO ITEM -->
+              <ng-container *ngIf="item.route">
                 <mat-list-item
-                  [routerLink]="[child.route]"
-                  (click)="changeRoute(child); sidenav.toggle()"
+                  [routerLink]="[item.route]"
+                  (click)="changeRoute(item); sidenav.toggle()"
                   routerLinkActive="router-active-link"
                 >
                   <mat-icon color="primary" mat-list-icon>
-                    {{ child.metadata }}
+                    {{ item.metadata }}
                   </mat-icon>
-                  {{ child.label }}
-                </mat-list-item>
-
-                <mat-list-item class="inactive" *ngIf="!child.route">
-                  <mat-icon color="primary" mat-list-icon>
-                    {{ child.metadata }}
-                  </mat-icon>
-                  {{ child.label }}
+                  {{ item.label }}
                 </mat-list-item>
               </ng-container>
-            </div>
-          </ng-container>
+
+              <ng-container *ngIf="!item.route && !item.subaccess?.length">
+                <mat-list-item class="inactive">
+                  <mat-icon color="primary" mat-list-icon>
+                    {{ item.metadata }}
+                  </mat-icon>
+                  {{ item.label }}
+                </mat-list-item>
+              </ng-container>
+
+              <!-- WITH CHILD NAV -->
+              <div class="my-4" *ngIf="!item.route && item.subaccess?.length">
+                <p
+                  style="
+                    height: auto;
+                    line-height: 10px;
+                    font-size: 10px;
+                    padding-left: 0.3rem;
+                    padding-right: 0.3rem;
+                    padding-bottom: 0;
+                    letter-spacing: 0.1rem;
+                    opacity: 0.7;
+                    text-align: left;
+                  "
+                  mat-subheader
+                >
+                  {{ item.label }}
+                </p>
+                <ng-container *ngFor="let child of item.subaccess">
+                  <mat-list-item
+                    [routerLink]="[child.route]"
+                    (click)="changeRoute(child); sidenav.toggle()"
+                    routerLinkActive="router-active-link"
+                  >
+                    <mat-icon color="primary" mat-list-icon>
+                      {{ child.metadata }}
+                    </mat-icon>
+                    {{ child.label }}
+                  </mat-list-item>
+
+                  <mat-list-item class="inactive" *ngIf="!child.route">
+                    <mat-icon color="primary" mat-list-icon>
+                      {{ child.metadata }}
+                    </mat-icon>
+                    {{ child.label }}
+                  </mat-list-item>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+          <div>
+            <button
+              style="width: 100%; margin-bottom: 10px"
+              mat-raised-button
+              (click)="onChangePassword()"
+            >
+              <mat-icon>vpn_key</mat-icon>
+              <span>Change Password</span>
+            </button>
+            <button
+              style="
+                background: #f44336;
+                color: white;
+                width: 100%;
+                margin-bottom: 10px;
+              "
+              mat-raised-button
+              (click)="confirmLogout()"
+            >
+              <mat-icon>settings_power</mat-icon>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </mat-list>
-    </div>
-    <div>
-      <button
-        style="width: 100%; margin-bottom: 10px"
-        mat-raised-button
-        (click)="onChangePassword()"
-      >
-        <mat-icon>vpn_key</mat-icon>
-        <span>Change Password</span>
-      </button>
-      <button
-        style="
-          background: #f44336;
-          color: white;
-          width: 100%;
-          margin-bottom: 10px;
-        "
-        mat-raised-button
-        (click)="confirmLogout()"
-      >
-        <mat-icon>settings_power</mat-icon>
-        <span>Logout</span>
-      </button>
     </div>
   </mat-sidenav>
   <!-- HEADER -->

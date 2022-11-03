@@ -214,8 +214,8 @@ export class RoleFormComponent implements OnInit {
             header: 'Before you proceed...',
             msg:
               this.data.action === 'add'
-                ? 'stop adding new user'
-                : `stop editing the details of ${this.data.form.firstName} ${this.data.form.lastName}`,
+                ? 'stop adding new role'
+                : `stop editing the details of ${this.data.form.name}`,
           },
         })
         .afterClosed()
@@ -228,8 +228,6 @@ export class RoleFormComponent implements OnInit {
       this.dialogRef.close();
     }
   }
-
-  onResetPassword() {}
 
   onSubmit() {
     this.dialog

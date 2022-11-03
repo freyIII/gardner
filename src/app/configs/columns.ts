@@ -180,6 +180,13 @@ export const SUBJECT_COLUMNS: Array<Column> = [
     type: 'text',
     selected: true,
   },
+  {
+    title: 'Professor Count',
+    breakpoint: 'xs',
+    path: 'nProfessors',
+    type: 'number',
+    selected: true,
+  },
 ];
 
 export const SCHEDULE_COLUMNS: Array<Column> = [

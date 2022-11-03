@@ -17,6 +17,7 @@ export class StrandComponent implements OnInit {
   tableConfig: SharedTableConfig = STRAND_TABLE_CONFIG;
   dataSource: Array<Strand> = [];
   dataLength: number = 0;
+  subjectsLength: number = 0;
 
   loading: boolean = true;
   saving: boolean = false;
@@ -39,6 +40,7 @@ export class StrandComponent implements OnInit {
       (response) => {
         this.dataSource = response.env.strands;
         this.dataLength = response.total_docs;
+        this.subjectsLength = response.total_subjects;
         this.loading = false;
       },
       (err) => {
@@ -64,15 +66,22 @@ export class StrandComponent implements OnInit {
   }
 
   onAdd() {
-    this.dialog
-      .open(StrandFormComponent, {
-        disableClose: true,
-        width: '50%',
-        data: { action: 'add', title: 'Add User' },
-      })
-      .afterClosed()
-      .subscribe((res) => {
-        if (res) this.fetchData(this.recentQuery);
+    if (this.subjectsLength) {
+      this.dialog
+        .open(StrandFormComponent, {
+          disableClose: true,
+          width: '50%',
+          data: { action: 'add', title: 'Add Strand' },
+        })
+        .afterClosed()
+        .subscribe((res) => {
+          if (res) this.fetchData(this.recentQuery);
+        });
+    } else {
+      this.sb.open('Error: No Subject yet!', 'Okay', {
+        duration: 3500,
+        panelClass: ['failed'],
       });
+    }
   }
 }

@@ -92,8 +92,16 @@ export class ScheduleFormComponent implements OnInit {
               }
             });
           }
-          console.log(startTimeIndex, endTimeIndex);
-          if (startTimeIndex > endTimeIndex) {
+          if (this.checkConf()) {
+            this.sb.open(
+              `Error: Start Time is conflicted to another professor's schedule`,
+              'Okay',
+              {
+                duration: 3500,
+                panelClass: ['failed'],
+              }
+            );
+          } else if (startTimeIndex > endTimeIndex) {
             this.sb.open('Error: End time is less than Start time', 'Okay', {
               duration: 3500,
               panelClass: ['failed'],
@@ -110,6 +118,49 @@ export class ScheduleFormComponent implements OnInit {
         }
       });
   }
+
+  checkConf() {
+    let { startTime, day, shift } = this.formGroup.getRawValue();
+    let existingStartTimeIndex: number;
+    let existingEndTimeIndex: number;
+    let startTimeIndex: number;
+    for (let sched of this.data.schedules) {
+      if (sched.day === day) {
+        if (shift === 'Morning') {
+          this.morningArray.forEach((arr, index) => {
+            if (arr === startTime) {
+              startTimeIndex = index;
+            }
+            if (arr === sched.startTime) {
+              existingStartTimeIndex = index;
+            }
+            if (arr === sched.endTime) {
+              existingEndTimeIndex = index;
+            }
+          });
+        } else {
+          this.afternoonArray.forEach((arr, index) => {
+            if (arr === startTime) {
+              startTimeIndex = index;
+            }
+            if (arr === sched.startTime) {
+              existingStartTimeIndex = index;
+            }
+            if (arr === sched.endsTime) {
+              existingEndTimeIndex = index;
+            }
+          });
+        }
+        if (
+          startTimeIndex >= existingStartTimeIndex &&
+          startTimeIndex <= existingEndTimeIndex
+        )
+          return true;
+      }
+    }
+    return false;
+  }
+
   onCancel() {
     if (this.formGroup.dirty) {
       this.dialog

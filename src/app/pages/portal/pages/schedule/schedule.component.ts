@@ -62,7 +62,12 @@ export class ScheduleComponent implements OnInit {
       .open(ScheduleCreatorComponent, {
         disableClose: true,
         panelClass: 'fullscreen-dialog-container',
-        data: { form: row, action: 'update', title: 'Update Schedule' },
+        data: {
+          form: row,
+          dataSource: this.dataSource,
+          action: 'update',
+          title: 'Update Schedule',
+        },
       })
       .afterClosed()
       .subscribe((res) => {
@@ -75,7 +80,11 @@ export class ScheduleComponent implements OnInit {
       .open(ScheduleCreatorComponent, {
         disableClose: true,
         panelClass: 'fullscreen-dialog-container',
-        data: { action: 'add', title: 'Add Schedule' },
+        data: {
+          dataSource: this.dataSource,
+          action: 'add',
+          title: 'Add Schedule',
+        },
       })
       .afterClosed()
       .subscribe((res) => {

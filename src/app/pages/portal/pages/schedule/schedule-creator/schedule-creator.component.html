@@ -103,7 +103,9 @@
                   "
                 >
                   <section
-                    class="event-me"
+                    [ngClass]="
+                      week.scheds[time].conflict ? 'event-others' : 'event-me'
+                    "
                     [ngStyle]="{
                       height:
                         'calc(' +
@@ -141,6 +143,12 @@
                     <p style="text-overflow: clip; font-size: 9px">
                       {{ week.scheds[time]._subject.name }}
                     </p>
+                    <p
+                      style="text-overflow: clip; font-size: 9px"
+                      *ngIf="week.scheds[time].conflict"
+                    >
+                      {{ "Conflict to: " + week.scheds[time].conflict.name }}
+                    </p>
                   </section>
                 </ng-container>
               </div>
@@ -175,7 +183,9 @@
                   "
                 >
                   <section
-                    class="event-me"
+                    [ngClass]="
+                      week.scheds[time].conflict ? 'event-others' : 'event-me'
+                    "
                     [ngStyle]="{
                       height:
                         'calc(' +
@@ -212,6 +222,12 @@
                     </div>
                     <p style="text-overflow: clip; font-size: 9px">
                       {{ week.scheds[time]._subject.name }}
+                    </p>
+                    <p
+                      style="text-overflow: clip; font-size: 9px"
+                      *ngIf="week.scheds[time].conflict"
+                    >
+                      {{ "Conflict to: " + week.scheds[time].conflict.name }}
                     </p>
                   </section>
                 </ng-container>
@@ -273,7 +289,12 @@
       Delete
     </button>
 
-    <button mat-raised-button color="primary" (click)="onSave()">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="isDisabled()"
+      (click)="onSave()"
+    >
       {{ saving ? "Saving..." : "Submit" }}
     </button>
   </div>
