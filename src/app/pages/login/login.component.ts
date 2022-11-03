@@ -5,9 +5,11 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/api/auth/auth.service';
+import { ForgotPasswordComponent } from 'src/app/shared/dialogs/forgot-password/forgot-password.component';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +30,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private sb: MatSnackBar,
-    public router: Router
+    public router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -85,5 +88,16 @@ export class LoginComponent implements OnInit {
         this.loggingIn = false;
       }
     );
+  }
+  forgotPassword() {
+    this.dialog
+      .open(ForgotPasswordComponent, {
+        panelClass: 'dialog-responsive-light',
+        disableClose: true,
+        data: this.credentials.getRawValue().email || '',
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((res: any) => {});
   }
 }

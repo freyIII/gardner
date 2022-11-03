@@ -37,11 +37,7 @@ export class UserFormComponent implements OnInit {
   selectedRole: Role;
   userFormField: Section[] = JSON.parse(JSON.stringify(USER_FORM));
   userInterface: any;
-  passwords = {
-    password: '',
-    passwordConfirm: '',
-  };
-  valid: boolean = false;
+
   message: string;
   saving: boolean;
   title: string;
@@ -91,12 +87,6 @@ export class UserFormComponent implements OnInit {
     this.title = this.data.title;
   }
 
-  onPasswordChange(event: any) {
-    console.log(event);
-    this.passwords = event.data;
-    this.valid = event.valid;
-  }
-
   autocompleteListener(role: Role) {
     this.selectedRole = role;
   }
@@ -129,7 +119,6 @@ export class UserFormComponent implements OnInit {
     );
     let body = {
       ...this.userDetails.form.getRawValue(),
-      ...this.passwords,
     };
     if (this.selectedRole) {
       body['_role'] = this.selectedRole._id;

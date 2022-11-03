@@ -14,6 +14,13 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/portal/portal.module').then((m) => m.PortalModule),
   },
+  {
+    path: 'reset-password/:id',
+    loadChildren: () =>
+      import('./pages/reset-password/reset-password.module').then(
+        (o) => o.ResetPasswordModule
+      ),
+  },
 ];
 
 @NgModule({

@@ -17,10 +17,6 @@
       [field]="roleField"
       (onControlChange)="autocompleteListener($event)"
     ></app-autocomplete-api>
-    <app-security-form
-      *ngIf="data.action === 'add'"
-      (onFormChange)="onPasswordChange($event)"
-    ></app-security-form>
   </div>
   <div mat-dialog-actions align="end">
     <div>
@@ -36,9 +32,7 @@
       <button
         mat-raised-button
         color="primary"
-        [disabled]="
-          !userDetails.form.valid || (data.action === 'add' && !valid) || saving
-        "
+        [disabled]="!userDetails.form.valid || saving"
         (click)="onSubmit()"
       >
         {{ saving ? "Saving..." : "Submit" }}

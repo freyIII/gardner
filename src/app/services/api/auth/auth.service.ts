@@ -39,6 +39,25 @@ export class AuthService {
     return this.http.get(this.url + '/auth/logout', this.getHeaders());
   }
 
+  verifyResetPassToken(token: string) {
+    return this.http.get(
+      this.url + `/auth/reset-password/${token}`,
+      this.getHeaders()
+    );
+  }
+
+  resetPassword(token: string, body: object) {
+    return this.http.put(
+      this.url + `/auth/reset-password/${token}`,
+      body,
+      this.getHeaders()
+    );
+  }
+
+  forgotPassword(email: string) {
+    return this.http.post(this.url + `/auth/forgot-password`, { email });
+  }
+
   updatePassword(body: object) {
     return this.http.put(
       this.url + '/auth/update-password',
