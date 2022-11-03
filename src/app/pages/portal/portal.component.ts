@@ -34,7 +34,7 @@ export class PortalComponent implements OnInit {
   routerChangeLoad: boolean = false;
   loadingCredentials: boolean = false;
   loggingOut: boolean = false;
-  loading;
+  loading: boolean = false;
   dashboard = {
     label: 'Dashboard',
     metadata: 'dashboard',
@@ -58,11 +58,27 @@ export class PortalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true;
     this.auth.me().subscribe(
       (res: any) => {
         this.me = res.env.user;
-
+        console.log(
+          this.me.type !== 'Superadmin' &&
+            this.me._role &&
+            this.me._role.accesses
+        );
         this.store.dispatch(setUser({ user: this.me }));
+
+        if (
+          this.me.type !== 'Superadmin' &&
+          this.me._role &&
+          this.me._role.accesses &&
+          this.me._role.accesses.length
+        ) {
+          this.navigation = this.me._role.accesses;
+        } else {
+          this.navigation = USER_NAVS;
+        }
 
         const currRoute = this.router.url.split('/').pop();
         let page = this.navigation.find((o: NavNode) => o.route == currRoute);
@@ -78,7 +94,8 @@ export class PortalComponent implements OnInit {
           });
         }
         this.routeLabel = page ? page.label : '';
-        console.log(this.me);
+
+        this.loading = false;
         if (this.me.isNewUser) this.onChangePassword();
       },
       (error: any) => {
@@ -86,6 +103,7 @@ export class PortalComponent implements OnInit {
           duration: 5000,
         });
         this.router.navigate(['/login']);
+        this.loading = false;
       }
     );
   }
