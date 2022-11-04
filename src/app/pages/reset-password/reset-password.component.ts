@@ -33,6 +33,12 @@ export class ResetPasswordComponent implements OnInit {
   submitting: boolean = false;
   loading: boolean = true;
 
+  passwords = {
+    password: '',
+    passwordConfirm: '',
+  };
+  valid: boolean = false;
+
   constructor(
     public router: Router,
     private fb: FormBuilder,
@@ -54,11 +60,15 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {}
-
+  onPasswordChange(event: any) {
+    console.log(event);
+    this.passwords = event.data;
+    this.valid = event.valid;
+  }
   onSubmit() {
     this.submitting = true;
     this.sb.open('Changing your password...', undefined);
-    this.auth.resetPassword(this.token, this.passwrd.getRawValue()).subscribe(
+    this.auth.resetPassword(this.token, this.passwords).subscribe(
       (res: any) => {
         this.sb.open(
           'Successfully changed password. Try Logging-in using your new password',

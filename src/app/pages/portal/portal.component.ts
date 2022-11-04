@@ -80,6 +80,8 @@ export class PortalComponent implements OnInit {
           this.navigation = USER_NAVS;
         }
 
+        console.log(this.navigation);
+
         const currRoute = this.router.url.split('/').pop();
         let page = this.navigation.find((o: NavNode) => o.route == currRoute);
 

@@ -24,13 +24,7 @@
                   [routerLink]="[item.route]"
                   (click)="changeRoute(item); sidenav.toggle()"
                   routerLinkActive="router-active-link"
-                  *ngIf="
-                    this.me.type !== 'Superadmin' &&
-                    this.me._role &&
-                    this.me._role.accesses
-                      ? item.hasAccess
-                      : !item.hasAccess
-                  "
+                  *ngIf="item.hasAccess"
                 >
                   <mat-icon color="primary" mat-list-icon>
                     {{ item.metadata }}
@@ -63,13 +57,7 @@
                     text-align: left;
                   "
                   mat-subheader
-                  *ngIf="
-                    this.me.type !== 'Superadmin' &&
-                    this.me._role &&
-                    this.me._role.accesses
-                      ? item.hasAccess
-                      : !item.hasAccess
-                  "
+                  *ngIf="item.hasAccess"
                 >
                   {{ item.label }}
                 </p>
@@ -78,14 +66,7 @@
                     [routerLink]="[child.route]"
                     (click)="changeRoute(child); sidenav.toggle()"
                     routerLinkActive="router-active-link"
-                    *ngIf="
-                      child.route &&
-                      this.me.type !== 'Superadmin' &&
-                      this.me._role &&
-                      this.me._role.accesses
-                        ? child.hasAccess
-                        : !child.hasAccess
-                    "
+                    *ngIf="child.hasAccess"
                   >
                     <mat-icon color="primary" mat-list-icon>
                       {{ child.metadata }}
