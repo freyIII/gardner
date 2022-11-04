@@ -108,18 +108,10 @@ export class RoomFormComponent implements OnInit {
       .subscribe(this.apiObserver);
   }
 
-  onStatusChange(action: string) {
-    let msg = '';
-    if (action === 'Deleted') {
-      msg = 'Deleting';
-    } else if (action === 'Active') {
-      msg = 'Activating';
-    } else if (action === 'Inactive') {
-      msg = 'Deactivating';
-    }
-    this.sb.open(`${msg} ${this.roomDetails.form.value.name}...`, undefined);
+  onDelete() {
+    this.sb.open(`Deleting ${this.roomDetails.form.value.name}...`, undefined);
     this.api.room
-      .updateRoomStatus(this.data.form._id, action)
+      .updateRoomStatus(this.data.form._id, 'Deleted')
       .subscribe(this.apiObserver);
   }
 
