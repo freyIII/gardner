@@ -124,7 +124,9 @@ export class ScheduleCreatorComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.data);
+  }
 
   get(strand: Strand, yearLevel: string, semester) {
     this.query = {
@@ -453,13 +455,16 @@ export class ScheduleCreatorComponent implements OnInit {
     professor: Professor,
     shift: string
   ) {
+    let conflict: any;
     for (let data of this.data.dataSource) {
       if (this.data.action === 'update') {
         if (data._id !== this.data.form._id) {
-          return this.getConf(startTime, endTime, shift, data, professor);
+          conflict = this.getConf(startTime, endTime, shift, data, professor);
+          if (conflict) return conflict;
         }
       } else {
-        return this.getConf(startTime, endTime, shift, data, professor);
+        conflict = this.getConf(startTime, endTime, shift, data, professor);
+        if (conflict) return conflict;
       }
     }
     return false;
