@@ -512,7 +512,7 @@ export class ScheduleCreatorComponent implements OnInit {
 
         if (
           (startTimeIndex >= existingStartTimeIndex &&
-            startTimeIndex <= existingEndTimeIndex) ||
+            startTimeIndex < existingEndTimeIndex) ||
           (endTimeIndex > existingStartTimeIndex &&
             endTimeIndex <= existingEndTimeIndex)
         ) {
