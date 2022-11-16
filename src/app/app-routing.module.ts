@@ -15,7 +15,7 @@ const routes: Routes = [
       import('./pages/portal/portal.module').then((m) => m.PortalModule),
   },
   {
-    path: 'reset-password/:id',
+    path: 'reset-password',
     loadChildren: () =>
       import('./pages/reset-password/reset-password.module').then(
         (o) => o.ResetPasswordModule

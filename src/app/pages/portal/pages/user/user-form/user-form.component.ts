@@ -37,15 +37,15 @@ export class UserFormComponent implements OnInit {
   selectedRole: Role;
   userFormField: Section[] = JSON.parse(JSON.stringify(USER_FORM));
   userInterface: any;
-
+  action: string;
   message: string;
   saving: boolean;
   title: string;
 
   apiObserver = {
     next: (response: any) => {
-      let pastTense = this.data.action.concat(
-        this.data.action.endsWith('e') ? 'd' : 'ed'
+      let pastTense = this.action.concat(
+        this.action.endsWith('e') ? 'd' : 'ed'
       );
       this.message = `Successfully ${pastTense}: ${this.userDetails.form.value.firstName} ${this.userDetails.form.value.lastName}!`;
       this.sb.open(this.message, 'Okay', {
@@ -85,6 +85,7 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.title = this.data.title;
+    this.action = this.util.deepCopy(this.data.action);
   }
 
   autocompleteListener(role: Role) {
@@ -147,6 +148,7 @@ export class UserFormComponent implements OnInit {
   }
 
   onDelete() {
+    this.action = 'delete';
     this.dialog
       .open(DialogAreYouSureComponent, {
         data: {

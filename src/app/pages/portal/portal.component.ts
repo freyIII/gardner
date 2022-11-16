@@ -168,7 +168,6 @@ export class PortalComponent implements OnInit {
       .open(ChangePasswordComponent, {
         disableClose: true,
         data: this.me,
-        panelClass: 'dialog-change',
       })
       .afterClosed()
       .subscribe((res: Boolean) => {

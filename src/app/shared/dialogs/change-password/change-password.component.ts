@@ -23,25 +23,12 @@ import { resetUser } from 'src/app/user/user.action';
   styleUrls: ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent implements OnInit {
-  credentialPassword = this.fb.group(
-    {
-      currentPassword: new FormControl('', [Validators.required]),
-      newPassword: new FormControl('', [
-        Validators.required,
-        Validators.minLength(8),
-      ]),
-      confirmNewPassword: new FormControl('', [
-        Validators.required,
-        Validators.minLength(8),
-      ]),
-    },
-    {
-      validator: this.matchPassword('newPassword', 'confirmNewPassword'),
-    }
-  );
+  credentialPassword = this.fb.group({
+    currentPassword: new FormControl('', [Validators.required]),
+  });
   me: any;
   pwMsg: string = '';
-
+  newPassword: any;
   loading: boolean = false;
   isLoggingOut: boolean = false;
   saving: boolean = false;
@@ -49,6 +36,7 @@ export class ChangePasswordComponent implements OnInit {
   hideNewPassword: boolean = true;
   hideConfirmNewPassword: boolean = true;
   pwError: boolean = false;
+  valid: boolean = false;
 
   constructor(
     public dialog: MatDialog,
@@ -75,6 +63,12 @@ export class ChangePasswordComponent implements OnInit {
     this.save();
   }
 
+  onPasswordChange(event: any) {
+    console.log(event);
+    this.newPassword = event.data;
+    this.valid = event.valid;
+  }
+
   onLogout() {
     this.isLoggingOut = true;
     this.sb.open('Logging Out...', undefined, { duration: 1500 });
@@ -95,66 +89,13 @@ export class ChangePasswordComponent implements OnInit {
     );
   }
 
-  matchPassword(newPassword: string, confirmNewPassword: string) {
-    return (fb: FormGroup) => {
-      const newPasswordControl = fb.controls[newPassword];
-      const confirmNewPasswordControl = fb.controls[confirmNewPassword];
-
-      if (!newPasswordControl || !confirmNewPasswordControl) {
-        return null;
-      }
-
-      if (
-        confirmNewPasswordControl.errors &&
-        !confirmNewPasswordControl.errors.passwordMismatch
-      ) {
-        return null;
-      }
-
-      if (newPasswordControl.value !== confirmNewPasswordControl.value) {
-        confirmNewPasswordControl.setErrors({ passwordMismatch: true });
-      } else {
-        confirmNewPasswordControl.setErrors(null);
-      }
-      return null;
-    };
-  }
-
-  pwCheck() {
-    let formRawValue = this.credentialPassword.getRawValue();
-    let dataCredential = {
-      currentPassword: formRawValue.currentPassword,
-      newPassword: formRawValue.newPassword,
-      confirmNewPassword: formRawValue.confirmNewPassword,
-    };
-
-    if (
-      dataCredential.currentPassword !== '' &&
-      dataCredential.newPassword !== '' &&
-      dataCredential.confirmNewPassword !== ''
-    ) {
-      if (dataCredential.newPassword !== dataCredential.confirmNewPassword) {
-        this.pwError = true;
-        this.pwMsg = 'Passwords did not match';
-      } else if (
-        dataCredential.currentPassword === dataCredential.newPassword ||
-        dataCredential.currentPassword === dataCredential.confirmNewPassword
-      ) {
-        this.pwError = true;
-        this.pwMsg = 'New password must not be the same as old password';
-      } else {
-        this.pwError = false;
-      }
-    }
-  }
-
   save() {
     this.saving = true;
     let formRawValue = this.credentialPassword.getRawValue();
     let dataCredential = {
       currentPassword: formRawValue.currentPassword,
-      newPassword: formRawValue.newPassword,
-      confirmNewPassword: formRawValue.confirmNewPassword,
+      newPassword: this.newPassword.password,
+      confirmNewPassword: this.newPassword.passwordConfirm,
     };
 
     this.sb.open('Changing your password...', undefined);

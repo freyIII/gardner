@@ -27,7 +27,7 @@ export class RoleFormComponent implements OnInit {
 
   message: string;
   title: string;
-
+  action: string;
   accesses: NavNode[] = this.util.deepCopy(USER_NAVS);
   lguAccesses: NavNode[] = [];
 
@@ -39,8 +39,8 @@ export class RoleFormComponent implements OnInit {
 
   apiObserver = {
     next: (response: any) => {
-      let pastTense = this.data.action.concat(
-        this.data.action.endsWith('e') ? 'd' : 'ed'
+      let pastTense = this.action.concat(
+        this.action.endsWith('e') ? 'd' : 'ed'
       );
       this.message = `Successfully ${pastTense}: ${this.roleDetails.form.value.name} !`;
       this.sb.open(this.message, 'Okay', {
@@ -72,6 +72,7 @@ export class RoleFormComponent implements OnInit {
     private util: UtilService
   ) {
     this.title = this.data.title;
+    this.action = this.util.deepCopy(this.data.action);
   }
 
   ngOnInit(): void {
@@ -270,6 +271,7 @@ export class RoleFormComponent implements OnInit {
   }
 
   onDelete() {
+    this.action = 'delete';
     this.dialog
       .open(DialogAreYouSureComponent, {
         data: {
