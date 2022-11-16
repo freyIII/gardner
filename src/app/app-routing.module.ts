@@ -7,7 +7,7 @@ const routes: Routes = [
   {
     path: 'login',
     loadChildren: () =>
-      import('./pages/login/login.module').then((o) => LoginModule),
+      import('./pages/login/login.module').then((m) => m.LoginModule),
   },
   {
     path: 'portal',
@@ -18,7 +18,7 @@ const routes: Routes = [
     path: 'reset-password',
     loadChildren: () =>
       import('./pages/reset-password/reset-password.module').then(
-        (o) => o.ResetPasswordModule
+        (m) => m.ResetPasswordModule
       ),
   },
 ];
