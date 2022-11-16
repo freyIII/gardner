@@ -10,11 +10,11 @@ app.use(forceSsl);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(express.static(__dirname + "/dist/gardner-scheduling-system"));
+app.use(express.static(__dirname + "/dist/gardner-sceduling-system"));
 
 app.get("/*", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "dist/gardner-scheduling-system/index.html")
+    path.join(__dirname, "dist/gardner-sceduling-system/index.html")
   );
 });
 
