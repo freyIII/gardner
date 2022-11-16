@@ -32,7 +32,10 @@ export class LoginComponent implements OnInit {
     private sb: MatSnackBar,
     public router: Router,
     private dialog: MatDialog
-  ) {}
+  ) {
+    this.credentials.get('email').setValue('superadmin@gmail.com');
+    this.credentials.get('password').setValue('Password123!');
+  }
 
   ngOnInit(): void {
     if (

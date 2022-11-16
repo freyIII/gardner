@@ -57,7 +57,7 @@ export class StrandComponent implements OnInit {
       .open(StrandFormComponent, {
         disableClose: true,
         width: '50%',
-        data: { form: row, action: 'update', title: 'Update User' },
+        data: { form: row, action: 'update', title: 'Update Strand' },
       })
       .afterClosed()
       .subscribe((res) => {

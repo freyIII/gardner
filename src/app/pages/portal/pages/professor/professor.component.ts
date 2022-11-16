@@ -58,7 +58,7 @@ export class ProfessorComponent implements OnInit {
       .open(ProfessorFormComponent, {
         disableClose: true,
         width: '50%',
-        data: { form: row, action: 'update', title: 'Update User' },
+        data: { form: row, action: 'update', title: 'Update Professor' },
       })
       .afterClosed()
       .subscribe((res) => {
@@ -72,7 +72,7 @@ export class ProfessorComponent implements OnInit {
         .open(ProfessorFormComponent, {
           disableClose: true,
           width: '50%',
-          data: { action: 'add', title: 'Add User' },
+          data: { action: 'add', title: 'Add Professor' },
         })
         .afterClosed()
         .subscribe((res) => {

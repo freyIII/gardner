@@ -187,6 +187,13 @@ export const SUBJECT_COLUMNS: Array<Column> = [
     type: 'number',
     selected: true,
   },
+  {
+    title: 'Strand Count',
+    breakpoint: 'xs',
+    path: 'nStrands',
+    type: 'number',
+    selected: true,
+  },
 ];
 
 export const SCHEDULE_COLUMNS: Array<Column> = [
