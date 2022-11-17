@@ -33,8 +33,8 @@ export class LoginComponent implements OnInit {
     public router: Router,
     private dialog: MatDialog
   ) {
-    this.credentials.get('email').setValue('superadmin@gmail.com');
-    this.credentials.get('password').setValue('Password123!');
+    this.credentials.get('email').setValue('gardnersuperadmin@mailsac.com');
+    this.credentials.get('password').setValue('rakuHBDQ6)');
   }
 
   ngOnInit(): void {
