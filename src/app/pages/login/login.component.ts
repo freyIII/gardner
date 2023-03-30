@@ -52,31 +52,33 @@ export class LoginComponent implements OnInit {
     this.loggingIn = true;
     this.auth.login(this.credentials.getRawValue()).subscribe(
       (res: any) => {
-        if (
-          res.env.user.type === 'Admin' ||
-          res.env.user.type === 'Assistant Admin' ||
-          res.env.user.type === 'Superadmin'
-        ) {
-          localStorage.setItem('SESSION_TOKEN', res.session_token);
-          localStorage.setItem('SESSION_AUTH', res.token);
-          this.sb
-            .open('Successful Login. Redirecting to profile...', undefined, {
-              duration: 1500,
-              panelClass: ['success'],
-            })
-            .afterDismissed()
-            .subscribe(() => {
-              this.router.navigate(['/portal']);
-            });
-        } else {
-          this.credentials.reset();
-          this.sb.open('Invalid Access.', 'Okay', {
-            duration: 1500,
-            panelClass: ['failed'],
-          });
+        this.router.navigate(['/portal']);
 
-          this.loggingIn = false;
-        }
+        // if (
+        //   res.env.user.type === 'Admin' ||
+        //   res.env.user.type === 'Assistant Admin' ||
+        //   res.env.user.type === 'Superadmin'
+        // ) {
+        //   localStorage.setItem('SESSION_TOKEN', res.session_token);
+        //   localStorage.setItem('SESSION_AUTH', res.token);
+        //   this.sb
+        //     .open('Successful Login. Redirecting to profile...', undefined, {
+        //       duration: 1500,
+        //       panelClass: ['success'],
+        //     })
+        //     .afterDismissed()
+        //     .subscribe(() => {
+        //       this.router.navigate(['/portal']);
+        //     });
+        // } else {
+        //   this.credentials.reset();
+        //   this.sb.open('Invalid Access.', 'Okay', {
+        //     duration: 1500,
+        //     panelClass: ['failed'],
+        //   });
+
+        //   this.loggingIn = false;
+        // }
       },
       (err) => {
         this.credentials.reset();
